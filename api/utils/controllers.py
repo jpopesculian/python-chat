@@ -11,6 +11,10 @@ class Controller(object):
         self.resource = self.name.split('_')[0] + 's'
         self.blueprint = Blueprint(self.name, __name__)
 
+    def send_static_file(self, filename):
+        from api.main import app
+        return app.send_static_file(filename)
+
 
 def route(url, **options):
     def _route(fn):
