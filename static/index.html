@@ -1,1 +1,25 @@
-<h1>Hello World</h1>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Seed Application</title>
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.png" />
+    <link type="text/css" rel="stylesheet" href="static/styles/main.css"  media="screen,projection"/>
+  </head>
+
+  <body>
+    <div id="app"></div>
+
+    <script type="text/javascript" src="static/scripts/jspm_packages/system.js"></script>
+    <script type="text/javascript" src="static/scripts/config.js"></script>
+    <script type="text/javascript">
+      System.import('app/app').then(function(module) {
+        var bootstrapper = module.default;
+        bootstrapper(document.getElementById('app'));
+      });
+    </script>
+    <!-- @ifdef DEBUG -->
+    <script src="//localhost:35729/livereload.js"></script>
+    <!-- @endif -->
+  </body>
+</html>

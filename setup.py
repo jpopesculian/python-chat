@@ -8,6 +8,7 @@ setup(
     author_email="jpopesculian@gmail.com, sudhirsharma101@gmail.com",
     install_requires=[
         "Flask",
+        "Flask-SocketIO",
         "gunicorn",
         "logbook"
     ],

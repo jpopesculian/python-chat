@@ -1,3 +1,14 @@
+# Build Resources
+node_modules
+**jspm_packages**
+
+# Build files
+www
+
+# Process Files
+start.sh
+RUNNING_PID
+
 ######################
 # PYTHON STUFF BELOW #
 ######################
