@@ -8,18 +8,10 @@ class Socket {
   constructor() {
     this.url = this.BASE_URL
     this.io = io(this.url)
-    this.io.on('connect', function(data) {
-      console.log(data)
-    })
     this.io.on('ping event', function(data) {
       console.log(data)
     })
-    this.io.send('some event', function(data, other, cool) {
-      console.log(data, other, cool)
-    })
-    this.io.on('some event', function(data) {
-      console.log(data)
-    })
+    this.io.emit('some event', {data: 'whatup?'})
   }
 
 

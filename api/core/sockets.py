@@ -1,4 +1,5 @@
-from flask.ext.socketio import SocketIO, send, emit
+import functools
+from flask.ext.socketio import SocketIO, emit
 
 socketio = SocketIO()
 
@@ -11,8 +12,10 @@ def socket(message='message', namespace=''):
             else:
                 full_namespace = namespace
             decorate = socketio.on(message, full_namespace)
-            def new_fn(*args):
-                return fn(self, *args)
+
+            @functools.wraps(fn)
+            def new_fn(*args, **kwargs):
+                return fn(self, *args, **kwargs)
             decorate(new_fn)
             return new_fn
         return wrapper

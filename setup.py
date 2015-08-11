@@ -9,6 +9,7 @@ setup(
     install_requires=[
         "Flask",
         "Flask-SocketIO",
+        "PyJWT",
         "greenlet",
         "gevent",
         "gunicorn",
