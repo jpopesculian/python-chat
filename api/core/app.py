@@ -23,7 +23,7 @@ class App(Flask):
         socketio.run(self)
 
     def register(self, controller):
-        instance = controller()
+        instance = controller(app=self)
         fn_decorators = find_decorators(controller)
         route_prog = re.compile(r".*id=\'(route|socket)\'.*")
         for func, decorators in fn_decorators.items():
