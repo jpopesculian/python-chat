@@ -9,6 +9,8 @@ setup(
     install_requires=[
         "Flask",
         "Flask-SocketIO",
+        "greenlet",
+        "gevent",
         "gunicorn",
         "logbook"
     ],
