@@ -4,13 +4,14 @@ from api.utils.codes import OK
 
 socketio = SocketIO()
 
-def emit(event, data=None, status=OK, headers={}, *args, **kwargs):
+def emit(event, data=None, status=OK, headers={}, **kwargs):
+    headers['status'] = status
     message = {
         'headers': headers,
         'data': data,
         'status': status
     }
-    return socketio.emit(event, message, *args, **kwargs)
+    return socketio.emit(event, message, **kwargs)
 
 def send(*args, **kwargs):
     kwargs['broadcast'] = False
@@ -28,7 +29,6 @@ def socket(message='message', namespace=''):
 
             @functools.wraps(fn)
             def new_fn(*args, **kwargs):
-                kwargs['_is_socket'] = True
                 result = fn(self, *args, **kwargs)
                 if type(result) is tuple:
                     result = send(*result)

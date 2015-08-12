@@ -12,6 +12,9 @@ class Socket {
       console.log(data)
     })
     this.io.emit('some event', {data: 'whatup?'})
+    this.io.on('authorized', function(data) {
+      console.log(data)
+    })
   }
 
 

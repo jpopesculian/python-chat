@@ -54,8 +54,7 @@ class App(Flask):
         resource = socketio.server_options.pop('resource', 'socket.io')
         if resource.startswith('/'):
             resource = resource[1:]
-        if self.debug:
-            socketio.server_options['async_mode'] = 'threading'
+        socketio.server_options['async_mode'] = 'threading'
 
         socketio.server = socketiolib.Server(**socketio.server_options)
         for namespace in socketio.handlers.keys():
