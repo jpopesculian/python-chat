@@ -6,7 +6,7 @@ node_modules
 www
 
 # Process Files
-# start.sh
+start.sh
 RUNNING_PID
 
 ######################
