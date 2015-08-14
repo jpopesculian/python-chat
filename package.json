@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "del": "^1.1.1",
+    "eslint": "^1.1.0",
     "gulp": "^3.8.11",
     "gulp-babel": "^5.1.0",
     "gulp-changed": "^1.2.1",
@@ -46,6 +47,16 @@
       "core-js": "npm:core-js@^0.9.4",
       "traceur": "github:jmcriffey/bower-traceur@0.0.88",
       "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.88"
+    }
+  },
+  "eslintConfig": {
+    "ecmaFeatures": {
+      "jsx": true,
+      "modules": true
+    },
+    "env": {
+      "browser": true,
+      "es6": true
     }
   }
 }

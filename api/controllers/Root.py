@@ -12,15 +12,3 @@ class RootController(Controller):
     @route('/')
     def index(self):
         return self.send_static_file('index.html')
-
-    @route('/test')
-    def show_post(self):
-        return 'Hello'
-
-    @route('/login')
-    def login(self):
-        return self.authorize({'id': 1})
-
-    @socket('some event')
-    def test2(self, data):
-        return self.authorize({'id': 1})

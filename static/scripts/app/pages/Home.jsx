@@ -5,7 +5,6 @@ class Home extends React.Component {
 
     constructor(props) {
         super(props)
-        Socket.emit('some event')
     }
 
     render() {

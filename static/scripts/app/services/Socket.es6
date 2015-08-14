@@ -11,7 +11,6 @@ class Socket {
       this.url += '/' + namespace
     }
     this.io = io(this.url)
-    this.on('authorized')
   }
 
   of(namespace) {
@@ -28,14 +27,20 @@ class Socket {
   }
 
   on(event='message', callback=()=>{}) {
-    this.io.on(event, function(res) {
+    let cb = function(res) {
       let {data, status, headers} = res
       let authorization = headers['Authorization']
       if (authorization) {
         JWT.key = authorization
       }
       callback(data, status, headers)
-    })
+    }
+    this.io.on(event, cb)
+    return cb
+  }
+
+  off(event, cb) {
+    return this.io.off(event, cb)
   }
 
 }

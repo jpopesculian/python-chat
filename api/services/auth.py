@@ -1,4 +1,4 @@
-import functools, jwt, datetime
+import functools, jwt, datetime, inspect
 from flask import request, jsonify
 from api.utils.codes import UNAUTHORIZED, OK
 from api.utils.strings import bytes_to_str
@@ -52,8 +52,8 @@ def update_exp(payload, config):
 
 def authorized(fn):
     @functools.wraps(fn)
-    def _authorized(self, *args, **kwargs):
-        config = self.app.config
+    def _authorized(*args, **kwargs):
+        config = args[0].app.config
         # get user from payload
         socket_data = None
         if is_socket():
@@ -67,22 +67,25 @@ def authorized(fn):
         user = payload['user']
 
         # Inject into function
-        print(dir(fn))
-        args.append(user)
-        result = fn(self, *args, **kwargs)
+        if 'current_user' in inspect.getargspec(fn).args:
+            kwargs['current_user'] = user
+        result = fn(*args, **kwargs)
         # refresh token
         if result:
-            payload = update_exp(payload)
+            payload = update_exp(payload, config)
             token = create_token(payload, config)
             header, token_string = header_string(token, config)
+            params = list(result) if type(result) is tuple else [result]
             if is_socket():
-                pass
+                event = params.pop(0)
+            message = params.pop(0) if params else None
+            status = params.pop(0) if params else OK
+            headers = params.pop(0) if params else {}
+            headers[header] = token_string
+            if is_socket():
+                result = (event, message, status, headers)
             else:
-                if type(result) is tuple:
-                    # @TODO: FIX THIS
-                    pass
-                else
-                    result = (result, OK, {header: token_string})
+                result = (message, status, headers)
         return result
     return _authorized
 

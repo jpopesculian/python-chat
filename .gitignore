@@ -9,6 +9,9 @@ www
 start.sh
 RUNNING_PID
 
+# local config
+api/config/local.py
+
 ######################
 # PYTHON STUFF BELOW #
 ######################
