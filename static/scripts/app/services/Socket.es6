@@ -1,6 +1,5 @@
 import io from 'socket.io-client'
 import JWT from './JWT'
-import Utils from './Utils'
 
 class Socket {
 
@@ -12,24 +11,29 @@ class Socket {
       this.url += '/' + namespace
     }
     this.io = io(this.url)
-    this.io.on('authorized', (data, status, headers) => {
-      JWT.key = headers['Authorization']
-    })
+    this.on('authorized')
   }
 
   of(namespace) {
     return new Socket(namespace)
   }
 
-  emit(event, data=null, status=200, headers={}) {
-    headers['Authorization'] = JWT.key
-    message = {data, status, headers}
+  emit(event='message', data=null, status=200, headers={}) {
+    let authorization = JWT.key
+    if (authorization) {
+      headers['Authorization'] = authorization
+    }
+    let message = {data, status, headers}
     this.io.emit(event, message)
   }
 
-  on(event, callback) {
+  on(event='message', callback=()=>{}) {
     this.io.on(event, function(res) {
       let {data, status, headers} = res
+      let authorization = headers['Authorization']
+      if (authorization) {
+        JWT.key = authorization
+      }
       callback(data, status, headers)
     })
   }
