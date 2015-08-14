@@ -10,6 +10,7 @@ setup(
         "Flask",
         "Flask-SocketIO",
         "PyJWT",
+        "SQLAlchemy",
         "greenlet",
         "gevent",
         "gunicorn",

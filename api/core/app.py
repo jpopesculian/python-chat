@@ -6,6 +6,7 @@ import api.config
 from api.utils.modules import find_decorators
 from .controllers import Controller
 from .sockets import socketio
+from .database import init_db
 
 class App(Flask):
 
@@ -15,6 +16,7 @@ class App(Flask):
         env = os.getenv('FLASK_ENV', 'dev')
         config = api.config.get_object(env)
         self.config.from_object(config)
+        self.init_db()
         if controllers:
             self.register_all(controllers)
         self.init_sockets()
@@ -63,3 +65,6 @@ class App(Flask):
 
         self.wsgi_app = socketiolib.Middleware(socketio.server, self.wsgi_app,
                                            socketio_path=resource)
+
+    def init_db(self):
+        return init_db(self)
