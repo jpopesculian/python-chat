@@ -11,6 +11,7 @@ setup(
         "Flask-SocketIO",
         "PyJWT",
         "SQLAlchemy",
+        "psycopg2",
         "greenlet",
         "gevent",
         "gunicorn",

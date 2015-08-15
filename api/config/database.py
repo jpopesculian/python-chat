@@ -1,0 +1,6 @@
+SQL_DIALECT = 'postgresql'
+SQL_DRIVER = 'psycopg2'
+DB_HOST = 'localhost'
+DB_DATABASE = 'test'
+DB_USER = 'julian'
+DB_PASS = 'password'
