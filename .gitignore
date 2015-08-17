@@ -6,10 +6,6 @@ static/scripts/config.js
 # Build files
 www
 
-# Process Files
-start.sh
-RUNNING_PID
-
 # local config
 api/config/local.py
 

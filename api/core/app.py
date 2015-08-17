@@ -1,6 +1,5 @@
 import inspect, re, os, json
 from flask import Flask
-from flask.ext.socketio import socketio as socketiolib
 
 import api.config
 from api.utils.modules import find_decorators
@@ -21,7 +20,7 @@ class App(Flask):
             self.register_all(controllers)
         self.init_sockets()
 
-    def run(self):
+    def start(self):
         socketio.run(self)
 
     def register(self, controller):
@@ -41,30 +40,13 @@ class App(Flask):
                 self.register(controller)
 
     def init_sockets(self):
-        socketio.init_app(self)
-
-        host = '127.0.0.1'
-        server_name = self.config['SERVER_NAME']
-        if server_name and ':' in server_name:
-            port = int(server_name.rsplit(':', 1)[1])
-        else:
-            port = 5000
-
-        test_mode = socketio.server_options.pop('test_mode', False)
-        log_output = socketio.server_options.pop('log_output', self.debug)
-        use_reloader = socketio.server_options.pop('use_reloader', self.debug)
-        resource = socketio.server_options.pop('resource', 'socket.io')
-        if resource.startswith('/'):
-            resource = resource[1:]
-        socketio.server_options['async_mode'] = 'threading'
-
-        socketio.server = socketiolib.Server(**socketio.server_options)
-        for namespace in socketio.handlers.keys():
-            for message, handler in socketio.handlers[namespace].items():
-                socketio.server.on(message, handler, namespace=namespace)
-
-        self.wsgi_app = socketiolib.Middleware(socketio.server, self.wsgi_app,
-                                           socketio_path=resource)
+        socket_options = {}
+        prog = re.compile(r'SOCKETIO.*')
+        for option, value in self.config.items():
+            if prog.match(option):
+                socket_option = '_'.join(option.split('_')[1:]).lower()
+                socket_options[socket_option] = value
+        socketio.init_app(self, **socket_options)
 
     def init_db(self):
         return init_db(self)

@@ -4,6 +4,7 @@ from . import general
 from . import database
 from . import local
 from . import logging
+from . import socketio
 
 def get_object(env='dev'):
 
@@ -19,7 +20,7 @@ def get_object(env='dev'):
         general,
         database,
         logging,
-        environment
+        socketio
     ] + [
         environment,
         local

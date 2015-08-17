@@ -12,9 +12,7 @@ setup(
         "PyJWT",
         "SQLAlchemy",
         "psycopg2",
-        "greenlet",
         "gevent",
-        "gunicorn",
         "logbook"
     ],
 )

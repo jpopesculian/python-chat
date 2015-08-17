@@ -7,4 +7,4 @@ app = App(__name__, controllers=controllers, \
     static_url_path='/static', static_folder='../www')
 
 if __name__ == '__main__':
-    app.run()
+    app.start()
