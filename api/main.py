@@ -6,5 +6,8 @@ log = Logger(__name__)
 app = App(__name__, controllers=controllers, \
     static_url_path='/static', static_folder='../www')
 
-if __name__ == '__main__':
+def run(**kwargs):
+    app.config.update(**kwargs)
     app.run()
+
+if __name__ == '__main__': run()
