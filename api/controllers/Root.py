@@ -1,7 +1,4 @@
 from api.core import Controller, route, socket
-from api.core.sockets import emit
-from api.services.auth import authorized
-from flask import request
 
 class RootController(Controller):
 

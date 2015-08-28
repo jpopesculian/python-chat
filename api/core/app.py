@@ -1,30 +1,38 @@
-import inspect, re, os, json
+import inspect, re, os
 from flask import Flask
-from flask.ext.socketio import socketio as socketiolib
 
 import api.config
 from api.utils.modules import find_decorators
+from api.utils.misc import splash
 from .controllers import Controller
-from .sockets import socketio
+from .sockets import Socket
 from .database import init_db
+from .logger import log
 
 class App(Flask):
 
     def __init__(self, *args, **kwargs):
         controllers = kwargs.pop('controllers', None)
+        env = kwargs.pop('env', None)
+        if type(env) is not str:
+            env = os.getenv('FLASK_ENV', 'dev')
+
         super().__init__(*args, **kwargs)
-        env = os.getenv('FLASK_ENV', 'dev')
+
         config = api.config.get_object(env)
         self.config.from_object(config)
-        self.init_db()
+        self._init_logger()
+        self._init_db()
+        self.socket = self._create_socket()
         if controllers:
-            self.register_all(controllers)
-        self.init_sockets()
+            self._register_all(controllers)
 
-    def run(self):
-        socketio.run(self)
+    def start(self):
+        if log.level_within('INFO'):
+            splash(self.config['SERVER_NAME'])
+        self.socket.run(self)
 
-    def register(self, controller):
+    def _register(self, controller):
         instance = controller(app=self)
         fn_decorators = find_decorators(controller)
         route_prog = re.compile(r".*id=\'(route|socket)\'.*")
@@ -34,37 +42,25 @@ class App(Flask):
                 getattr(instance, func)()
         self.register_blueprint(instance.blueprint, url_prefix=instance.get_url())
 
-    def register_all(self, module):
+    def _register_all(self, module):
         controllers = [member[1] for member in inspect.getmembers(module, inspect.isclass)]
         for controller in controllers:
             if issubclass(controller, Controller):
-                self.register(controller)
+                self._register(controller)
 
-    def init_sockets(self):
-        socketio.init_app(self)
+    def _create_socket(self):
+        socket = Socket()
+        socket_options = {}
+        prog = re.compile(r'SOCKETIO.*')
+        for option, value in self.config.items():
+            if prog.match(option):
+                socket_option = '_'.join(option.split('_')[1:]).lower()
+                socket_options[socket_option] = value
+        socket.init_app(self, **socket_options)
+        return socket
 
-        host = '127.0.0.1'
-        server_name = self.config['SERVER_NAME']
-        if server_name and ':' in server_name:
-            port = int(server_name.rsplit(':', 1)[1])
-        else:
-            port = 5000
-
-        test_mode = socketio.server_options.pop('test_mode', False)
-        log_output = socketio.server_options.pop('log_output', self.debug)
-        use_reloader = socketio.server_options.pop('use_reloader', self.debug)
-        resource = socketio.server_options.pop('resource', 'socket.io')
-        if resource.startswith('/'):
-            resource = resource[1:]
-        socketio.server_options['async_mode'] = 'threading'
-
-        socketio.server = socketiolib.Server(**socketio.server_options)
-        for namespace in socketio.handlers.keys():
-            for message, handler in socketio.handlers[namespace].items():
-                socketio.server.on(message, handler, namespace=namespace)
-
-        self.wsgi_app = socketiolib.Middleware(socketio.server, self.wsgi_app,
-                                           socketio_path=resource)
-
-    def init_db(self):
+    def _init_db(self):
         return init_db(self)
+
+    def _init_logger(self):
+        log.level = self.config['LOG_LEVEL']

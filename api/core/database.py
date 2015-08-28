@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from .logger import log
 
 Db = sessionmaker()
 Model = declarative_base()
@@ -33,6 +34,6 @@ def get_connection_string(config):
 
 def init_db(app):
     connection_string = get_connection_string(app.config)
-    engine = create_engine(connection_string, echo=True)
+    engine = create_engine(connection_string, echo=log.level_within('DEBUG'))
     Model.metadata.create_all(engine)
     Db.configure(bind=engine)

@@ -1,3 +1,2 @@
-DEBUG = False
-LOG_LEVEL = 'WARNING'
+LOG_LEVEL = 'WARN'
 LOG_DIR = 'logs/'

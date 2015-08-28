@@ -1,0 +1,1 @@
+SOCKETIO_ASYNC_MODE = "gevent"
