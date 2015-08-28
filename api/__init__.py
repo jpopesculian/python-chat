@@ -1,4 +1,4 @@
-import click
+import click, os
 from . import main
 
 @click.group()
