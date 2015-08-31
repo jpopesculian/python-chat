@@ -6,12 +6,23 @@ from flask import request
 
 class Controller(object):
 
+    _VERSION = 1
+
     def __init__(self, app):
         self.app = app
-        self.name = to_camel_case(self.__class__.__name__)
-        self.version = 'v1'
-        self.resource = self.name.split('_')[0] + 's'
         self.blueprint = Blueprint(self.name, __name__)
+
+    @property
+    def name(self):
+        return getattr(self, '_NAME', to_camel_case(self.__class__.__name__))
+
+    @property
+    def version(self):
+        return 'v%d' % self._VERSION
+
+    @property
+    def resource(self):
+        return getattr(self, '_RESOURCE', self.name.split('_')[0] + 's')
 
     @property
     def socket(self):
@@ -20,6 +31,10 @@ class Controller(object):
     @property
     def request(self):
         return request
+
+    @property
+    def config(self):
+        return self.app.config
 
     def send_static_file(self, filename):
         return self.app.send_static_file(filename)

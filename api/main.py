@@ -1,13 +1,12 @@
-from api.core import App, log
+from api.core import App
 import api.controllers as controllers
-from api.utils.misc import splash
 
 
 def create_app(**kwargs):
-    return App(__name__, controllers=controllers, **kwargs)
+    return App(__name__.split('.')[0], controllers=controllers, instance_relative_config=True, **kwargs)
 
-def run(env=None, static_url_path='/static', static_folder='../www', **config):
-    app = create_app(env=env, static_url_path=static_url_path, static_folder= static_folder)
+def run(env=None, **config):
+    app = create_app(env=env)
     app.config.update(**config)
     app.start()
 

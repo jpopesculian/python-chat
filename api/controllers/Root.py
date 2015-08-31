@@ -2,9 +2,7 @@ from api.core import Controller, route, socket
 
 class RootController(Controller):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.resource = None
+    _RESOURCE = ''
 
     @route('/')
     def index(self):

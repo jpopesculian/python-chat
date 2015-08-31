@@ -1,1 +1,3 @@
 LOG_LEVEL = 'DEBUG'
+RELOAD = True
+DEBUG = True

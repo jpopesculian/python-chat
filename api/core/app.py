@@ -16,10 +16,13 @@ class App(Flask):
         env = kwargs.pop('env', None)
         if type(env) is not str:
             env = os.getenv('FLASK_ENV', 'dev')
+        config = api.config.get_object(env)
+
+        kwargs['static_url_path'] = getattr(config, 'STATIC_URL_PATH', '/static')
+        kwargs['static_folder'] = getattr(config, 'STATIC_FOLDER', '../www')
 
         super().__init__(*args, **kwargs)
 
-        config = api.config.get_object(env)
         self.config.from_object(config)
         self._init_logger()
         self._init_db()
@@ -27,10 +30,13 @@ class App(Flask):
         if controllers:
             self._register_all(controllers)
 
-    def start(self):
+    def start(self, host=None, port=None, **kwargs):
+        if not host: host = self.config.get('HOST', 'localhost')
+        if not port: port = self.config.get('PORT', 5000)
+        kwargs['use_reloader'] = self.config.get('RELOAD', False)
         if log.level_within('INFO'):
-            splash(self.config['SERVER_NAME'])
-        self.socket.run(self)
+            splash('http://%s:%s' % (host, port))
+        return self.socket.run(self, host, port, **kwargs)
 
     def _register(self, controller):
         instance = controller(app=self)
@@ -49,15 +55,13 @@ class App(Flask):
                 self._register(controller)
 
     def _create_socket(self):
-        socket = Socket()
         socket_options = {}
         prog = re.compile(r'SOCKETIO.*')
         for option, value in self.config.items():
             if prog.match(option):
                 socket_option = '_'.join(option.split('_')[1:]).lower()
                 socket_options[socket_option] = value
-        socket.init_app(self, **socket_options)
-        return socket
+        return Socket(self, **socket_options)
 
     def _init_db(self):
         return init_db(self)
