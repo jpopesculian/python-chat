@@ -8,6 +8,7 @@ class User(Model):
 
     id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
     name = Column(String)
+    email = Column(String)
     passports = relationship('Passport', backref='user', cascade="all, delete-orphan")
     messages = relationship('Message', backref='user', cascade="all, delete-orphan")
 
@@ -15,4 +16,4 @@ class User(Model):
     updated_at = Column(DateTime, onupdate=now)
 
     def __repr__(self):
-        return "<User(id='%s', name='%s')>" % (self.id, self.name)
+        return "<User(id='%s', name='%s', email='%s')>" % (self.id, self.name, self.email)

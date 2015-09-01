@@ -6,3 +6,6 @@ def to_camel_case(string):
 
 def bytes_to_str(byte_string, encoding='utf-8'):
     return byte_string.decode(encoding)
+
+def str_to_bytes(string, encoding='utf-8'):
+    return bytes(string, encoding)

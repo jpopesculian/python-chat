@@ -11,7 +11,7 @@ def install(dependency, cache=True, upgrade=True, ignore=True, quiet=True):
     if quiet: command.append('--quiet')
     command.append(dependency)
     print ('Installing %s' % dependency)
-    # return subprocess.call(command)
+    return subprocess.call(command)
 
 def install_all(dependency_groups):
 
@@ -74,7 +74,9 @@ dependency_groups = [
         "gevent>=1.1b3",
         "logbook>=0.10.1",
         "click>=5.1",
-        "requests>=2.7.0"
+        "requests>=2.7.0",
+        "socketIO-client>=0.6.5",
+        "bcrypt>=2.0.0"
     ),
     "Flask-SocketIO>=1.0a1"
 ]

@@ -1,7 +1,8 @@
 import functools
-from flask import Blueprint
+from flask import Blueprint, json
 from api.utils.strings import to_camel_case
 from api.services.auth import authorize
+from api.utils.codes import OK
 from flask import request
 
 class Controller(object):
@@ -42,6 +43,12 @@ class Controller(object):
             return '/api/' + self.version + '/' + self.resource
         return ''
 
+    def json(self, obj, status=OK, headers=None):
+        headers = dict() if not type(headers) is dict else headers
+        status = 500 if not type(status) is int else status
+        headers['Content-Type'] = 'application/json'
+        return (json.dumps(obj), status, headers)
+
     def send_static_file(self, filename):
         return self.app.send_static_file(filename)
 
@@ -62,7 +69,13 @@ def route(url, **options):
 
             @functools.wraps(fn)
             def new_fn(*args, **kwargs):
-                return fn(self, *args, **kwargs)
+                response = fn(self, *args, **kwargs)
+                if type(response) is dict or type(response) is list:
+                    return self.json(response)
+                elif type(response) is tuple:
+                    return self.json(*response)
+                return response
+                
             decorate(new_fn)
             return new_fn
         return wrapper

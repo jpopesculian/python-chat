@@ -2,6 +2,6 @@ import requests
 from .config import host
 
 def test():
-    payload = {'username': 'testuser', 'password': 'password'}
-    response = requests.get('%s/api/v1/auth/local' % host)
+    payload = {'email': 'test@email.com', 'username': 'testuser', 'password': 'password'}
+    response = requests.post('%s/api/v1/auth/local/register' % host, json=payload)
     print(response.text)

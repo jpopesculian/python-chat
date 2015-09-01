@@ -52,43 +52,49 @@ def update_exp(payload, config):
     payload['exp'] = exp_time
     return payload
 
-def authorized(fn):
-    @functools.wraps(fn)
-    def _authorized(*args, **kwargs):
-        config = args[0].app.config
-        # get user from payload
-        socket_data = None
-        if is_socket():
-            if len(args) == 2:
-                socket_data = args[1]
-        payload = get_jwt_payload(config, socket_data)
-        if 'user' not in payload:
+def authorized(reject=True):
+    def _authorized(fn):
+        @functools.wraps(fn)
+        def inner(*args, **kwargs):
+            config = args[0].app.config
+            # get user from payload
+            socket_data = None
             if is_socket():
-                return ('unauthorized', {'error': 'Not Authorized!'}, UNAUTHORIZED)
-            return (jsonify({'error': 'Not Authorized!'}), UNAUTHORIZED, {})
-        user = deserialize_user(payload['user'])
-
-        # Inject into function
-        if 'current_user' in inspect.getargspec(fn).args:
-            kwargs['current_user'] = user
-        result = fn(*args, **kwargs)
-        # refresh token
-        if result:
-            payload = update_exp(payload, config)
-            token = create_token(payload, config)
-            header, token_string = header_string(token, config)
-            params = list(result) if type(result) is tuple else [result]
-            if is_socket():
-                event = params.pop(0)
-            message = params.pop(0) if params else None
-            status = params.pop(0) if params else OK
-            headers = params.pop(0) if params else {}
-            headers[header] = token_string
-            if is_socket():
-                result = (event, message, status, headers)
+                if len(args) == 2:
+                    socket_data = args[1]
+            payload = get_jwt_payload(config, socket_data)
+            if 'user' not in payload:
+                if reject:
+                    if is_socket():
+                        return ('unauthorized', {'error': 'Not Authorized!'}, UNAUTHORIZED)
+                    return ({'error': 'Not Authorized!'}, UNAUTHORIZED)
+                else:
+                    user = None
             else:
-                result = (message, status, headers)
-        return result
+                user = deserialize_user(payload['user'])
+
+            # Inject into function
+            if 'current_user' in inspect.getargspec(fn).args:
+                kwargs['current_user'] = user
+            result = fn(*args, **kwargs)
+            # refresh token
+            if result and user is not None:
+                payload = update_exp(payload, config)
+                token = create_token(payload, config)
+                header, token_string = header_string(token, config)
+                params = list(result) if type(result) is tuple else [result]
+                if is_socket():
+                    event = params.pop(0)
+                message = params.pop(0) if params else None
+                status = params.pop(0) if params else OK
+                headers = params.pop(0) if params else {}
+                headers[header] = token_string
+                if is_socket():
+                    result = (event, message, status, headers)
+                else:
+                    result = (message, status, headers)
+            return result
+        return inner
     return _authorized
 
 def authorize(controller, user, message='authorized', socket_data=None):
@@ -102,15 +108,19 @@ def authorize(controller, user, message='authorized', socket_data=None):
     # get headers
     header, token_string = header_string(token, config)
     headers = {header: token_string}
+    message = {'message': message} if type(message) is not dict else message
     if is_socket():
         return ('authorized', message, OK, headers)
     return (message, OK, headers)
 
 def serialize_user(user):
-    if type(user) is int:
+    if type(user) is User:
+        return user.id
+    elif type(user) is int:
         return user
-    return user.id
+    return None
 
-def deserialize_user(user):
-    db = Db()
-    return db.query(User).filter_by(id=user).first()
+def deserialize_user(user_id):
+    if type(user_id) is int:
+        return Db().query(User).filter_by(id=user_id).first()
+    return None
