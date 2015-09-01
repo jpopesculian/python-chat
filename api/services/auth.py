@@ -3,6 +3,8 @@ from flask import request, jsonify
 from api.utils.codes import UNAUTHORIZED, OK
 from api.utils.strings import bytes_to_str
 from api.utils.handlers import is_socket
+from api.models import User
+from api.core import Db
 
 def get_jwt_payload(config, socket_data=None):
     # Get token from request
@@ -64,7 +66,7 @@ def authorized(fn):
             if is_socket():
                 return ('unauthorized', {'error': 'Not Authorized!'}, UNAUTHORIZED)
             return (jsonify({'error': 'Not Authorized!'}), UNAUTHORIZED, {})
-        user = payload['user']
+        user = deserialize_user(payload['user'])
 
         # Inject into function
         if 'current_user' in inspect.getargspec(fn).args:
@@ -94,7 +96,7 @@ def authorize(controller, user, message='authorized', socket_data=None):
     # get current token payload if it exists
     payload = get_jwt_payload(config, socket_data)
     # make new token
-    payload['user'] = user
+    payload['user'] = serialize_user(user)
     payload = update_exp(payload, config)
     token = create_token(payload, config)
     # get headers
@@ -103,3 +105,12 @@ def authorize(controller, user, message='authorized', socket_data=None):
     if is_socket():
         return ('authorized', message, OK, headers)
     return (message, OK, headers)
+
+def serialize_user(user):
+    if type(user) is int:
+        return user
+    return user.id
+
+def deserialize_user(user):
+    db = Db()
+    return db.query(User).filter_by(id=user).first()

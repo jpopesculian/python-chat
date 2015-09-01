@@ -36,13 +36,14 @@ class Controller(object):
     def config(self):
         return self.app.config
 
+    @property
+    def url_prefix(self):
+        if self.version and self.resource:
+            return '/api/' + self.version + '/' + self.resource
+        return ''
+
     def send_static_file(self, filename):
         return self.app.send_static_file(filename)
-
-    def get_url(self):
-        if self.version and self.resource:
-            return self.version + '/' + self.resource
-        return ''
 
     def authorize(self, *args, **kwargs):
         return authorize(self, *args, **kwargs)

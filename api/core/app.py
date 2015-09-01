@@ -46,7 +46,7 @@ class App(Flask):
             route_decs = [decorator for decorator in decorators if route_prog.match(decorator)]
             if len(route_decs) > 0:
                 getattr(instance, func)()
-        self.register_blueprint(instance.blueprint, url_prefix=instance.get_url())
+        self.register_blueprint(instance.blueprint, url_prefix=instance.url_prefix)
 
     def _register_all(self, module):
         controllers = [member[1] for member in inspect.getmembers(module, inspect.isclass)]
