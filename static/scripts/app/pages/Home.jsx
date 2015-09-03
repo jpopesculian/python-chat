@@ -1,5 +1,4 @@
 import React from 'react';
-import Socket from 'app/services/Socket';
 
 class Home extends React.Component {
 

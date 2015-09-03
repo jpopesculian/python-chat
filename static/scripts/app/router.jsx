@@ -32,14 +32,7 @@ function page(path) {
 
 let router = (
   <Router history={history}>
-    <Route component={Main}>
-      <Route path='/' getComponents={page('Home')} />
-      <Route path='login' getComponents={page('auth/Login')} />
-      <Route path='register' getComponents={page('auth/Register')} />
-      <Route path='app' component={page('App')}>
-        {/* App Routes */}
-      </Route>
-    </Route>
+    <Route path='/' getComponents={page('Home')} />
   </Router>
 );
 
