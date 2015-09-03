@@ -4,21 +4,39 @@ import { Router, Route } from 'react-router';
 import { history } from 'react-router/lib/HashHistory';
 
 import Main from './Main';
+import EventQueue from './services/EventQueue'
 
-import Home from './pages/Home';
+let importQueue = new EventQueue()
+let firstPageImported = false
 
-import AuthLogin from './pages/auth/Login';
-import AuthRegister from './pages/auth/Register';
+function importLater(path) {
+  if (firstPageImported) return System.import(path)
+  return importQueue.add(System.import.bind(System, path))
+}
 
-import App from './pages/App';
+function importAll() {
+  firstPageImported = true
+  importQueue.execute(System)
+}
+
+function page(path) {
+  path = 'app/pages/' + path
+  importLater(path)
+  return (cb) => {
+    System.import(path).then((component) => {
+      cb(null, component.default)
+      importAll()
+    })
+  }
+}
 
 let router = (
   <Router history={history}>
     <Route component={Main}>
-      <Route path='/' component={Home} />
-      <Route path='login' component={AuthLogin} />
-      <Route path='register' component={AuthRegister} />
-      <Route path='app' component={App}>
+      <Route path='/' getComponents={page('Home')} />
+      <Route path='login' getComponents={page('auth/Login')} />
+      <Route path='register' getComponents={page('auth/Register')} />
+      <Route path='app' component={page('App')}>
         {/* App Routes */}
       </Route>
     </Route>
