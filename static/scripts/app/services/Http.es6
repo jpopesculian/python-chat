@@ -37,7 +37,7 @@ class Http {
       }
       options = Object.assign(options, args)
       xhr(options, (err, res, body) => {
-        response = {err, res, body}
+        let response = {err, res, body}
         if (res.statusCode == 200) {
           JWT.key = res.headers.authorization
           observer.onNext(response)

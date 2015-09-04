@@ -6,7 +6,6 @@ class TextField extends React.Component {
   }
 
   render() {
-
     return (
       <div>
         <label>{this.props.label}</label>

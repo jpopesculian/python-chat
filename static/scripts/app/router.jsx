@@ -8,6 +8,7 @@ let lazyLoader = new LazyLoader('app/pages/')
 let router = (
   <Router>
     <Route path='/' getComponents={lazyLoader.component('Home')} />
+    <Route path='/register' getComponents={lazyLoader.component('auth/Register')} />
   </Router>
 );
 

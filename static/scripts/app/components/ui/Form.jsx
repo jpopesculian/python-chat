@@ -7,14 +7,9 @@ class Form extends React.Component {
 
   render() {
     return (
-      <div>
-        <form {...this.props}>
-          {this.props.children}
-          <div className="form-error">
-            {this.props.error}
-          </div>
-        </form>
-      </div>
+      <form {...this.props}>
+        {this.props.children}
+      </form>
     )
   }
 }
