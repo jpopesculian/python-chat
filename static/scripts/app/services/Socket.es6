@@ -1,15 +1,12 @@
 import io from 'socket.io-client'
 import JWT from './JWT'
+import Rx from 'rx'
+import { HOST } from 'app/config/general'
 
 class Socket {
 
-  BASE_URL = 'http://localhost:5000'
-
   constructor(namespace='') {
-    this.url = this.BASE_URL
-    if (namespace) {
-      this.url += '/' + namespace
-    }
+    this.url = namespace ? `${HOST}/${namespace}` : HOST
     this.io = io(this.url)
   }
 
@@ -26,21 +23,15 @@ class Socket {
     this.io.emit(event, message)
   }
 
-  on(event='message', callback=()=>{}) {
-    let cb = function(res) {
-      let {data, status, headers} = res
-      let authorization = headers['Authorization']
-      if (authorization) {
-        JWT.key = authorization
-      }
-      callback(data, status, headers)
-    }
-    this.io.on(event, cb)
-    return cb
-  }
-
-  off(event, cb) {
-    return this.io.off(event, cb)
+  on(event='message') {
+    let observable = Rx.Observable.create(function (observer) {
+      this.io.on(event, (res) => {
+        let authorization = res.headers['Authorization']
+        if (authorization) JWT.key = authorization
+        observer.onNext(res)
+      })
+    })
+    return observable
   }
 
 }

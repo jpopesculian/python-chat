@@ -7,3 +7,7 @@ class RootController(Controller):
     @route('/')
     def index(self):
         return self.send_static_file('index.html')
+
+    @route('/test')
+    def test(self):
+        return {'test': 'hello'}

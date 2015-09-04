@@ -1,38 +1,13 @@
-import React from 'react';
+import React from 'react'
 
-import { Router, Route } from 'react-router';
-import { history } from 'react-router/lib/HashHistory';
+import { Router, Route } from 'react-router'
+import LazyLoader from './services/LazyLoader'
 
-import Main from './Main';
-import EventQueue from './services/EventQueue'
-
-let importQueue = new EventQueue()
-let firstPageImported = false
-
-function importLater(path) {
-  if (firstPageImported) return System.import(path)
-  return importQueue.add(System.import.bind(System, path))
-}
-
-function importAll() {
-  firstPageImported = true
-  importQueue.execute(System)
-}
-
-function page(path) {
-  path = 'app/pages/' + path
-  importLater(path)
-  return (cb) => {
-    System.import(path).then((component) => {
-      cb(null, component.default)
-      importAll()
-    })
-  }
-}
+let lazyLoader = new LazyLoader('app/pages/')
 
 let router = (
-  <Router history={history}>
-    <Route path='/' getComponents={page('Home')} />
+  <Router>
+    <Route path='/' getComponents={lazyLoader.component('Home')} />
   </Router>
 );
 

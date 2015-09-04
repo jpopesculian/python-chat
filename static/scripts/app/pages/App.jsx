@@ -3,7 +3,7 @@ import Rx from 'rx'
 import Http from 'app/services/Http'
 import RxSubject from 'app/services/RxSubject'
 
-class Home extends React.Component {
+class App extends React.Component {
 
     constructor(props) {
         super(props)
@@ -25,4 +25,4 @@ class Home extends React.Component {
     }
 }
 
-export default Home
+export default App

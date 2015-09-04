@@ -50,6 +50,11 @@ class Utils {
       return this.isNum(n) && n % 1 !== 0;
   }
 
+  pop(obj, key) {
+    let value = obj[key]
+    delete obj[key]
+    return value
+  }
 }
 
 export default new Utils()

@@ -6,8 +6,10 @@ class TextField extends React.Component {
   }
 
   render() {
+
     return (
       <div>
+        <label>{this.props.label}</label>
         <input {...this.props} />
         <div className="textfield-error">
           {this.props.error}

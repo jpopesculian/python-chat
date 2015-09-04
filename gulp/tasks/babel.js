@@ -5,7 +5,9 @@ module.exports = function (gulp, plugins, mode) {
         dev: function () {
             var file_exts = ['es6', 'jsx'];
             file_exts.forEach(function(file_ext) {
-                gulp.src(settings.static_src + 'scripts/**/*.' + file_ext,
+                gulp.src([settings.static_src + 'scripts/**/*.' + file_ext,
+                    '!' + settings.static_src + 'scripts/jspm_packages',
+                    '!' + settings.static_src + 'scripts/jspm_packages/**'],
                     {base: settings.static_src})
                     .pipe(plugins.changed(settings.static_dest))
                     .pipe(plugins.preprocess({context: settings.env.dev}))
