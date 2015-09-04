@@ -18,12 +18,20 @@ class Utils {
     return true;
   }
 
+  isNull(obj) {
+    return obj === null
+  }
+
   isDefined(x) {
-    return (x || (x !== undefined && x !== null))
+    return (x || (x !== undefined && !isNull(x)))
   }
 
   isObj(obj) {
-    return obj !== null && typeof obj === 'object' && !this.isArr(obj)
+    return !isNull(obj) && typeof obj === 'object'
+  }
+
+  isDict(dict) {
+    return this.isObj(dict) && !this.isArr(dict)
   }
 
   isArr(arr) {
