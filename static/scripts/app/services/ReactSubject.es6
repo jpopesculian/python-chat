@@ -18,7 +18,7 @@
 import Rx from 'rx'
 
 
-class RxSubject {
+class ReactSubject {
 
   /**
    * Create a simple 'function' that is also a RxJS Subject.
@@ -27,7 +27,7 @@ class RxSubject {
    *
    * example:
    *
-   * var eventHandler = RxSubject.create();
+   * var eventHandler = ReactSubject.create();
    * eventHandler.subscribe(function (val) {
    *   console.log(val);
    * });
@@ -62,7 +62,7 @@ class RxSubject {
    *
    * example:
    *
-   * var eventHandler = RxSubject.behavior('hello');
+   * var eventHandler = ReactSubject.behavior('hello');
    * eventHandler.subscribe(function (val) {
    *   console.log(val);
    * }); // log hello
@@ -95,4 +95,4 @@ class RxSubject {
 }
 
 
-export default RxSubject
+export default ReactSubject

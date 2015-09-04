@@ -1,34 +1,60 @@
 import Rx from 'rx'
 import Utils from './Utils'
 import LocalStorage from './LocalStorage'
+import Immutable from 'immutable'
 
 class Store {
 
   constructor(config, namespace) {
-    this.namespace = namespace
-    this.config = config
+    this.namespace = namespace ? namespace : 'root'
+    this._config = Immutable.fromJS(config)
     this._store = {}
-    this._subjects = {}
+    this._actionStreams = Immutable.Map()
+    this._valueStreams = Immutable.Map()
+    this._updateStreams = Immutable.Map()
+    this._storers = Immutable.Map()
 
-    for (let key in this.config) {
-      let config = this.config[key]
+    this._config.map((config, key) => {
+      // get initial value
       let value = undefined
-      let subject = new Rx.Subject()
-      if (Utils.isDefined(config.startWith)) {
-        value = config.startWith
+      if (Utils.isDefined(config.get('startWith'))) {
+        value = config.get('startWith')
       }
-      if (config.persist && !Utils.isNull()) {
+      if (config.get('persist')) {
         let locallyStored = LocalStorage.get(this._storageKey(key))
+        locallyStored = this._deserialize(key, locallyStored)
         value = !Utils.isNull(locallyStored) ? locallyStored : value
       }
-      if (Utils.isDefined(value)) {
-        subject.startWith(value)
-      }
-      this._subjects[key] = subject
       this._store[key] = value
-      let update = this._update.bind(this, key)
-      let stream = subject.subscribe(update)
-    }
+
+      // initialize streams
+      let valueStream = new Rx.Subject()
+      let actionStream = new Rx.Subject()
+
+      let transform = Utils.isFunc(config.get('transform')) ?
+        config.get('transform') : (old, update) => update
+      let updateStream = actionStream.withLatestFrom(valueStream, (action, value) => {
+        let newValue = transform(value, action.value, action.op)
+        valueStream.onNext(newValue)
+        return {value: newValue, action: action}
+      })
+
+      updateStream.subscribe()
+      actionStream.subscribe()
+      valueStream.subscribe()
+
+      valueStream.onNext(value)
+
+      this._valueStreams = this._valueStreams.set(key, valueStream)
+      this._actionStreams = this._actionStreams.set(key, actionStream)
+      this._updateStreams = this._updateStreams.set(key, updateStream)
+
+      // update storage on next
+      let storeValue = this._storeValue.bind(this, key)
+      let storer = valueStream.subscribe(storeValue)
+      this._storers = this._storers.set(key, storer)
+
+    })
   }
 
   get(key) {
@@ -36,21 +62,30 @@ class Store {
   }
 
   set(key, value) {
-    let config = this.config[key]
-    if (!config || (Utils.isFunc(config.type) && !config.type(value))) {
-      return false
-    }
-    this._subjects[key].onNext(value)
-    return true
+    this.update(key, value, 'set')
   }
 
-  stream(key) {
-    return this._subjects[key]
+  update(key, value, op) {
+    this._actionStreams.get(key).onNext({op, value})
   }
 
-  _update(key, value) {
+  values(key) {
+    return this._valueStreams.get(key).map((x)=>x)
+  }
+
+  updates(key) {
+    return this._updateStreams.get(key).map((x)=>x)
+  }
+
+  actions(key) {
+    return this._actionStreams.get(key).map((x)=>x)
+  }
+
+  _storeValue(key, value) {
+    let config = this._config.get(key)
     this._store[key] = value
-    if (this.config[key].persist) {
+    if (config.get('persist')) {
+      value = this._serialize(key, value)
       LocalStorage.set(this._storageKey(key), value)
     }
     return true
@@ -60,16 +95,61 @@ class Store {
     return `${this.namespace}:${key}`
   }
 
+  _isValid(key, value) {
+    let config = this._config.get(key)
+    if (!config) {
+      return false
+    }
+    let type = config.get('type')
+    if (type && Utils.isFunc(type.validator) && !type.validator(value)) {
+      return false
+    }
+    return true
+  }
+
+  _serialize(key, value) {
+    let config = this._config.get(key)
+    let type = config.get('type')
+    if (type && Utils.isFunc(type.serialize)) {
+      return type.serialize(value)
+    }
+    return value
+  }
+
+  _deserialize(key, value) {
+    let config = this._config.get(key)
+    let type = config.get('type')
+    if (type && Utils.isFunc(type.deserialize)) {
+      return type.deserialize(value)
+    }
+    return value
+  }
+
 }
 
 export const types = {
-  STR: Utils.isStr,
-  INT: Utils.isInt,
-  FLOAT: Utils.isFloat,
-  NUM: Utils.isNUm,
-  ARR: Utils.isArr,
-  OBJ: Utils.isObj,
-  DICT: Utils.isDict
+  STR: {
+    validator: Utils.isStr,
+  },
+  INT: {
+    validator: Utils.isInt,
+  },
+  FLOAT: {
+    validator: Utils.isFloat,
+  },
+  NUM: {
+    validator: Utils.isNUm,
+  },
+  LIST: {
+    validator: Immutable.List.isList,
+    serialize: (x) => x.toArray(),
+    deserialize: (x) => Immutable.List(x)
+  },
+  MAP: {
+    validator: Immutable.Map.isMap,
+    serialize: (x) => x.toObject(),
+    deserialize: (x) => Immutable.Map(x)
+  }
 }
 
 export default Store
