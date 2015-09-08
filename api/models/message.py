@@ -1,7 +1,7 @@
 from api.core import Model, Base
 from sqlalchemy import Column, Integer, Text, ForeignKey, Index
 
-class Message(Base, Model):
+class Message(Model, Base):
 
     user_id = Column(Integer, ForeignKey('users.id', onupdate='CASCADE', ondelete='CASCADE'))
     room_id = Column(Integer, ForeignKey('rooms.id', onupdate='CASCADE', ondelete='CASCADE'))

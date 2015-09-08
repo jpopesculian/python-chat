@@ -5,6 +5,7 @@ import validator from 'validator'
 
 import ReactSubject from 'app/services/ReactSubject'
 import Http from 'app/services/Http'
+import Utils from 'app/services/Utils'
 
 import TextField from 'app/components/ui/TextField'
 import Button from 'app/components/ui/Button'
@@ -59,11 +60,23 @@ class Register extends React.Component {
     this._passwordFieldStream = ReactSubject.create()
     this._formSubmitStream = ReactSubject.create()
 
-    let userValues = this._usernameFieldStream.map((event) => event.target.value)
+    let userValues = this._usernameFieldStream.map(Utils.extractTargetValue)
     userValues.subscribe((value) => {
       this._formValues = this._formValues.set('username', value)
     })
     userValues.debounce(300).subscribe(this._validateUsername.bind(this))
+
+    let emailValues = this._emailFieldStream.map(Utils.extractTargetValue)
+    emailValues.subscribe((value) => {
+      this._formValues = this._formValues.set('email', value)
+    })
+    emailValues.debounce(300).subscribe(this._validateEmail.bind(this))
+
+    let passwordValues = this._passwordFieldStream.map(Utils.extractTargetValue)
+    passwordValues.subscribe((value) => {
+      this._formValues = this._formValues.set('password', value)
+    })
+    passwordValues.debounce(300).subscribe(this._validatePassword.bind(this))
 
     this._formSubmitStream
       .map((event) => {
@@ -73,31 +86,62 @@ class Register extends React.Component {
       .filter(this._validateForm.bind(this))
       .flatMap(() => {
         let data = this._formValues.toObject()
-        return Http.get('/test')
+        return Http.post('/api/v1/auth/local/register', data)
       })
       .subscribe(
-        (success) => {
+        (response) => {
           console.log(response)
         },
         (error) => {
-
+          console.error(error)
         })
   }
 
   _validateForm() {
     let valid = true
-    valid = valid ? this._validateUsername(this._formValues.get('username')) : false
+    valid = Utils.AND(this._validateUsername(this._formValues.get('username')), valid)
+    valid = Utils.AND(this._validateEmail(this._formValues.get('email')), valid)
+    valid = Utils.AND(this._validatePassword(this._formValues.get('password')), valid)
     return valid
   }
 
   _validateUsername(username) {
     let error = ''
+    let username_re = /^[a-zA-Z0-9][a-zA-Z0-9_\-+\.]*[a-zA-Z0-9]$/
     if (!username) {
-      error = 'Username Required'
+      error = 'Required'
     } else if (username.length < 3) {
-      error = 'Username must be 3 characters long'
+      error = 'Must be at least 3 characters long'
+    } else if (username.length > 64) {
+      error = "Must be less than 64 characters long"
+    } else if (!username_re.test(username)) {
+      error = 'May only contain numbers, letters and + . - or _'
     }
     this.setState({form: this.state.form.set('usernameError', error)})
+    return !error
+  }
+
+  _validateEmail(email) {
+    let error = ''
+    if (!email) {
+      error = 'Required'
+    } else if (!Utils.isEmail(email)) {
+      error = 'Must be a valid email address'
+    }
+    this.setState({form: this.state.form.set('emailError', error)})
+    return !error
+  }
+
+  _validatePassword(password) {
+    let error = ''
+    if (!password) {
+      password = 'Required'
+    } if (password.length < 5) {
+      error = 'Must be at least 5 characters long'
+    } else if (password.length > 64) {
+      error = "Must be less than 64 characters long"
+    }
+    this.setState({form: this.state.form.set('passwordError', error)})
     return !error
   }
 

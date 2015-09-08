@@ -8,7 +8,7 @@ from .logger import log
 
 Db = sessionmaker()
 
-class Model(object):
+class Model:
 
     @declared_attr
     def __tablename__(cls):

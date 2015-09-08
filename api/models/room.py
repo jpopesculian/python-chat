@@ -2,7 +2,7 @@ from api.core import Model, Base
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
-class Room(Base, Model):
+class Room(Model, Base):
 
     name = Column(String, index=True, unique=True)
     messages = relationship('Message', backref='room')

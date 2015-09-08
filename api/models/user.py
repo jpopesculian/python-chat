@@ -5,7 +5,7 @@ from api.utils.validators import is_email, is_username
 from sqlalchemy import Column
 from sqlalchemy.orm import relationship, validates
 
-class User(Base, Model):
+class User(Model, Base):
 
     name = Column(NormalizedString, index=True, unique=True)
     email = Column(NormalizedString, index=True, unique=True)

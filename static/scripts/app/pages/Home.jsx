@@ -1,7 +1,7 @@
 import React from 'react'
 import Rx from 'rx'
 import Http from 'app/services/Http'
-import RxSubject from 'app/services/RxSubject'
+import ReactSubject from 'app/services/ReactSubject'
 import UserStore from 'app/stores/User'
 
 class Home extends React.Component {
@@ -20,9 +20,15 @@ class Home extends React.Component {
   }
 
   componentWillMount() {
-    this._buttonClickStream = RxSubject.create()
+    this._buttonClickStream = ReactSubject.create()
     this._buttonClickStream.subscribe((event) => console.log(event))
-    Rx.Observable.interval(1000).startWith(0).subscribe((seconds) => this.setState({seconds}))
+    this._secondStream = Rx.Observable.interval(1000).startWith(0)
+      .subscribe((seconds) => this.setState({seconds}))
+  }
+
+  componentWillUnmount() {
+    this._buttonClickStream.dispose()
+    this._secondStream.dispose()
   }
 }
 

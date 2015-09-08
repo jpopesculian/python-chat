@@ -58,10 +58,28 @@ class Utils {
       return this.isNum(n) && n % 1 !== 0;
   }
 
+  isEmail(email) {
+    if (!this.isStr(email)) return false
+    let email_re = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
+    return email_re.test(email)
+  }
+
   pop(obj, key) {
     let value = obj[key]
     delete obj[key]
     return value
+  }
+
+  extractTargetValue(event) {
+    return event.target.value
+  }
+
+  AND(x, y) {
+    return (x & y) == 1
+  }
+
+  OR(x, y) {
+    return (x | y) == 1
   }
 }
 

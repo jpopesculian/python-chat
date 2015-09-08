@@ -1,7 +1,7 @@
 from api.core import Model, Base
 from sqlalchemy import Column, Integer, ForeignKey, Index
 
-class Membership(Base, Model):
+class Membership(Model, Base):
 
     user_id = Column(Integer, ForeignKey('users.id', onupdate='CASCADE', ondelete='CASCADE'))
     room_id = Column(Integer, ForeignKey('rooms.id', onupdate='CASCADE', ondelete='CASCADE'))

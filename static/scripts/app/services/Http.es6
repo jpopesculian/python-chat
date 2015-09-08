@@ -57,7 +57,7 @@ class Http {
 
   static addGetParamsUrl(url, params) {
     if (!params) return url
-    for (param in params) {
+    for (let param in params) {
       let value = encodeURIComponent(JSON.stringify(params[param]))
       let seperator = url.split('?').length > 1 ? '&' : '?'
       url += seperator + param + '=' + value

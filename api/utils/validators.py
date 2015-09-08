@@ -1,6 +1,6 @@
 import re
 
-EMAIL_RE = re.compile(r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)')
+EMAIL_RE = re.compile(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
 USERNAME_RE = re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9_\-+\.]*[a-zA-Z0-9]$')
 
 def is_email(email):

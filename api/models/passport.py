@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Index
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
 
-class Passport(Base, Model):
+class Passport(Model, Base):
 
     user_id = Column(Integer, ForeignKey('users.id', onupdate='CASCADE', ondelete='CASCADE'))
     provider = Column(ENUM('local', 'google', name='providers'))
