@@ -9,3 +9,6 @@ def bytes_to_str(byte_string, encoding='utf-8'):
 
 def str_to_bytes(string, encoding='utf-8'):
     return bytes(string, encoding)
+
+def normalize_str(string):
+    return string.strip().lower()
