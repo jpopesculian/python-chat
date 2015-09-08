@@ -1,20 +1,14 @@
-from api.core import Model
-from api.utils.time import now
+from api.core import Model, Base
 from api.utils.crypto import hash_pw, check_pw
-from sqlalchemy import Column, Integer, String, Sequence, ForeignKey, DateTime, Index
+from sqlalchemy import Column, Integer, String, ForeignKey, Index
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
 
-class Passport(Model):
-    __tablename__ = 'passports'
+class Passport(Base, Model):
 
-    id = Column(Integer, Sequence('passport_id_seq'), primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id', onupdate='CASCADE', ondelete='CASCADE'))
     provider = Column(ENUM('local', 'google', name='providers'))
     _key = Column('key', String)
-
-    created_at = Column(DateTime, default=now)
-    updated_at = Column(DateTime, onupdate=now, default=now)
 
     Index('user_id', 'provider', unique=True)
 

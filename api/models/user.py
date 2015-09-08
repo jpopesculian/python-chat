@@ -1,22 +1,16 @@
-from api.core import Model
-from api.utils.time import now
+from api.core import Model, Base
 from api.utils.database import NormalizedString
 from api.utils.strings import normalize_str
 from api.utils.validators import is_email, is_username
-from sqlalchemy import Column, Integer, Sequence, DateTime
+from sqlalchemy import Column
 from sqlalchemy.orm import relationship, validates
 
-class User(Model):
-    __tablename__ = 'users'
+class User(Base, Model):
 
-    id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
     name = Column(NormalizedString, index=True, unique=True)
     email = Column(NormalizedString, index=True, unique=True)
     passports = relationship('Passport', backref='user')
     messages = relationship('Message', backref='user')
-
-    created_at = Column(DateTime, default=now)
-    updated_at = Column(DateTime, onupdate=now, default=now)
 
     @validates('name')
     def validates_name(self, key, name):
@@ -33,4 +27,5 @@ class User(Model):
         return email
 
     def __repr__(self):
-        return "<User(id='%s', name='%s', email='%s')>" % (self.id, self.name, self.email)
+        return "<User(id='%s', name='%s', email='%s')>" % \
+            (self.id, self.name, self.email)

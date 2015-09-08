@@ -1,16 +1,10 @@
-from api.core import Model
-from api.utils.time import now
-from sqlalchemy import Column, Integer, Sequence, ForeignKey, DateTime, Index
+from api.core import Model, Base
+from sqlalchemy import Column, Integer, ForeignKey, Index
 
-class Membership(Model):
-    __tablename__ = 'memberships'
+class Membership(Base, Model):
 
-    id = Column(Integer, Sequence('membership_id_seq'), primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id', onupdate='CASCADE', ondelete='CASCADE'))
     room_id = Column(Integer, ForeignKey('rooms.id', onupdate='CASCADE', ondelete='CASCADE'))
-
-    created_at = Column(DateTime, default=now)
-    updated_at = Column(DateTime, onupdate=now, default=now)
 
     Index('user_id', 'room_id', unique=True)
 

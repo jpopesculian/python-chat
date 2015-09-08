@@ -17,5 +17,4 @@ def run(env, **kwargs):
     for option, value in kwargs.items():
         if value is not None:
             config['_'.join(option.upper().split('-'))] = value
-    print(config)
     main.run(env, **config)

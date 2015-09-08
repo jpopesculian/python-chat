@@ -1,18 +1,13 @@
-from api.core import Model
-from api.utils.time import now
-from sqlalchemy import Column, Integer, String, Sequence, DateTime
+from api.core import Model, Base
+from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
-class Room(Model):
-    __tablename__ = 'rooms'
+class Room(Base, Model):
 
-    id = Column(Integer, Sequence('room_id_seq'), primary_key=True)
     name = Column(String, index=True, unique=True)
     messages = relationship('Message', backref='room')
     users = relationship('User', secondary='memberships', backref='rooms')
 
-    created_at = Column(DateTime, default=now)
-    updated_at = Column(DateTime, onupdate=now, default=now)
-
     def __repr__(self):
-        return "<Romm(id='%s', name='%s')>" % (self.id, self.name)
+        return "<Romm(id='%s', name='%s')>" % \
+            (self.id, self.name)

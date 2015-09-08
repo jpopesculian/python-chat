@@ -10,13 +10,12 @@ class AuthController(Controller):
 
     @route('/logout')
     def logout(self):
-        return 'logout'
+        return {'message': 'logged out'}, 200, {}
 
     @route('/who')
-    @authorized
+    @authorized()
     def who(self, current_user):
-        print(current_user)
-        return 'who'
+        return current_user.dict()
 
     @route('/<provider>', methods=['GET', 'POST'])
     def provider(self, provider):
@@ -31,7 +30,7 @@ class AuthController(Controller):
         user = db.query(User) \
             .filter((User.email == identifier) | (User.name == identifier)) \
             .join(User.passports, aliased=True) \
-            .filter_by(provider='local') \
+            .filter_by(provider=provider) \
             .first()
         if not user:
             return {'error': 'invalid_user'}, UNAUTHORIZED
