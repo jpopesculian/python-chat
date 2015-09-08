@@ -1,5 +1,5 @@
 from setuptools import setup
-import pip, threading, subprocess, re
+import threading, subprocess, re
 
 def install(dependency, cache=True, upgrade=True, ignore=True, quiet=True):
     if not dependency:

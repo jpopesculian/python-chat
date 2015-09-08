@@ -1,5 +1,5 @@
 import functools, jwt, datetime, inspect
-from flask import request, jsonify
+from flask import request
 from api.utils.codes import UNAUTHORIZED, OK
 from api.utils.strings import bytes_to_str
 from api.utils.handlers import is_socket
@@ -82,7 +82,7 @@ def authorized(reject=True):
                 payload = update_exp(payload, config)
                 token = create_token(payload, config)
                 header, token_string = header_string(token, config)
-                params = list(result) if type(result) is tuple else [result]
+                params = list(result) if isinstance(result, tuple) else [result]
                 if is_socket():
                     event = params.pop(0)
                 message = params.pop(0) if params else None
@@ -108,19 +108,19 @@ def authorize(controller, user, message='authorized', socket_data=None):
     # get headers
     header, token_string = header_string(token, config)
     headers = {header: token_string}
-    message = {'message': message} if type(message) is not dict else message
+    message = {'message': message} if not isinstance(message, dict) else message
     if is_socket():
         return ('authorized', message, OK, headers)
     return (message, OK, headers)
 
 def serialize_user(user):
-    if type(user) is User:
+    if isinstance(user, User):
         return user.id
-    elif type(user) is int:
+    elif isinstance(user, int):
         return user
     return None
 
 def deserialize_user(user_id):
-    if type(user_id) is int:
+    if isinstance(user_id, int):
         return Db().query(User).filter_by(id=user_id).first()
     return None

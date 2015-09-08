@@ -2,6 +2,7 @@ from api.core import Controller, route, Db
 from api.models import User, Passport
 from api.utils.codes import UNAUTHORIZED
 from api.utils.misc import all_in
+from api.services.auth import authorized
 
 class AuthController(Controller):
 
@@ -12,12 +13,35 @@ class AuthController(Controller):
         return 'logout'
 
     @route('/who')
-    def who(self):
+    @authorized
+    def who(self, current_user):
+        print(current_user)
         return 'who'
 
-    @route('/<provider>')
+    @route('/<provider>', methods=['GET', 'POST'])
     def provider(self, provider):
-        return provider
+        if provider == 'local':
+            data = self.request.json
+            if not all_in(data, 'identifier', 'password'):
+                return {'error': 'form_incomplete'}, UNAUTHORIZED
+            key = data['password']
+            identifier = data['identifier']
+        # find user
+        db = Db()
+        user = db.query(User) \
+            .filter((User.email == identifier) | (User.name == identifier)) \
+            .join(User.passports, aliased=True) \
+            .filter_by(provider='local') \
+            .first()
+        if not user:
+            return {'error': 'invalid_user'}, UNAUTHORIZED
+        # check passport
+        if len(user.passports) < 1:
+            return {'error': 'no_local_passport'}, UNAUTHORIZED
+        passport = user.passports[0]
+        if not passport.key_matches(key):
+            return {'error': 'password_wrong'}, UNAUTHORIZED
+        return self.authorize(user)
 
     @route('/<provider>/<action>', methods=['GET', 'POST'])
     def callback(self, provider, action):
@@ -31,7 +55,9 @@ class AuthController(Controller):
             name = data['username']
         # find / create user
         db = Db()
-        user = db.query(User).filter((User.email == email) | (User.name == name)).first()
+        user = db.query(User) \
+            .filter((User.email == email) | (User.name == name)) \
+            .first()
         if user and provider == 'local':
             return {'error': "user_exists"}, UNAUTHORIZED
         elif not user:

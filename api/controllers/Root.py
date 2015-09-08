@@ -1,4 +1,4 @@
-from api.core import Controller, route, socket
+from api.core import Controller, route
 
 class RootController(Controller):
 
@@ -7,3 +7,7 @@ class RootController(Controller):
     @route('/')
     def index(self):
         return self.send_static_file('index.html')
+
+    @route('/ping')
+    def ping(self):
+        return 'pong'
