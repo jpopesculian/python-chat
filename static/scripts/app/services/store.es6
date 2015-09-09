@@ -1,6 +1,6 @@
 import Rx from 'rx'
-import {isDefined, isNull, isFunc, isStr, isInt, isFloat, isNum} from './Utils'
-import LocalStorage from './LocalStorage'
+import {isDefined, isNull, isFunc, isStr, isInt, isFloat, isNum} from './utils'
+import LocalStorage from './local-storage'
 import Immutable from 'immutable'
 
 class Store {

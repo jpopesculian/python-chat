@@ -1,5 +1,5 @@
 import io from 'socket.io-client'
-import JWT from './JWT'
+import JWT from './jwt'
 import Rx from 'rx'
 import { HOST } from 'app/config/general'
 import { AUTH_HEADER_NAME } from 'app/config/auth'

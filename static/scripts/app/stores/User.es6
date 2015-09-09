@@ -1,10 +1,11 @@
 import Store, {types} from 'app/services/Store'
+import Immutable from 'immutable'
 
 let userStore = {
-  test: {
+  current: {
     persist: true,
-    startWith: 'hello',
-    type: types.STR
+    startWith: Immutable.Map(),
+    type: types.MAP
   }
 }
 

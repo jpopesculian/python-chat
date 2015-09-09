@@ -34,6 +34,7 @@
       "baseURL": "static/scripts"
     },
     "dependencies": {
+      "history": "npm:history@^1.8.4",
       "immutable": "npm:immutable@^3.7.5",
       "react": "npm:react@^0.14.0-beta1",
       "react-dom": "npm:react-dom@^0.14.0-beta1",

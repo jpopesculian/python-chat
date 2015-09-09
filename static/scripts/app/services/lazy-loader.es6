@@ -1,5 +1,5 @@
-import EventQueue from './EventQueue'
-import {forEach} from './Utils'
+import EventQueue from './event-queue'
+import {forEach} from './utils'
 
 class LazyLoader {
 

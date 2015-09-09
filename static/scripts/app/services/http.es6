@@ -1,7 +1,7 @@
 import xhr from 'xhr'
-import JWT from './JWT'
+import JWT from './jwt'
 import Rx from 'rx'
-import {forEach} from './Utils'
+import {forEach} from './utils'
 import { HOST } from 'app/config/general'
 import { AUTH_HEADER_NAME } from 'app/config/auth'
 

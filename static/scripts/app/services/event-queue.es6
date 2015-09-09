@@ -1,4 +1,4 @@
-import {uuidGenerator} from './Utils'
+import {uuidGenerator} from './utils'
 
 class EventQueue {
 

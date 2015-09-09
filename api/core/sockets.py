@@ -5,8 +5,8 @@ from api.utils.codes import OK
 class Socket(SocketIO):
 
     def emit(self, event, data=None, status=OK, headers=None, **kwargs):
-        headers = dict() if not type(headers) is dict else headers
-        status = 500 if not type(status) is int else status
+        headers = dict() if not isinstance(headers, dict) else headers
+        status = 500 if not isinstance(status, int) else status
         headers['status'] = status
         message = {
             'headers': headers,
@@ -19,23 +19,27 @@ class Socket(SocketIO):
         kwargs['broadcast'] = False
         return self.emit(*args, **kwargs)
 
-def socket(message='message', namespace=''):
+def socket(messages='message', namespace=''):
+    messages = messages if isinstance(messages, list) else [messages]
     def _route(fn):
         def wrapper(self):
+
+            @functools.wraps(fn)
+            def new_fn(*args, **kwargs):
+                result = fn(self, *args, **kwargs)
+                if isinstance(result, tuple):
+                    result = self.send(*result)
+                return result
+
             base_namespace = getattr(self, 'get_url')()
             if base_namespace:
                 full_namespace = base_namespace + '/' + namespace
             else:
                 full_namespace = namespace
-            decorate = self.socket.on(message, full_namespace)
+            for message in messages:
+                decorate = self.socket.on(message, full_namespace)
+                decorate(new_fn)
 
-            @functools.wraps(fn)
-            def new_fn(*args, **kwargs):
-                result = fn(self, *args, **kwargs)
-                if type(result) is tuple:
-                    result = self.send(*result)
-                return result
-            decorate(new_fn)
             return new_fn
         return wrapper
     return _route

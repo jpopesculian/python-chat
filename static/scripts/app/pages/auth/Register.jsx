@@ -3,9 +3,9 @@ import Immutable from 'immutable'
 import {Navigation} from 'react-router'
 import reactMixin from 'react-mixin'
 
-import { initiateStreams, disposeStreams } from 'app/services/ReactSubject'
-import Http from 'app/services/Http'
-import {extractTargetValue, isEmail} from 'app/services/Utils'
+import StreamMap from 'app/services/stream-map'
+import Http from 'app/services/http'
+import {extractTargetValue, isEmail} from 'app/services/utils'
 
 import TextField from 'app/components/ui/TextField'
 import Button from 'app/components/ui/Button'
@@ -25,7 +25,7 @@ class Register extends React.Component {
   }
 
   componentWillMount() {
-    this.streams = initiateStreams('usernameField', 'emailField', 'passwordField', 'formSubmit')
+    this.streams = new StreamMap('usernameField', 'emailField', 'passwordField', 'formSubmit')
 
     let userValues = this.streams.get('usernameField').map(extractTargetValue)
     userValues.subscribe((value) => {
@@ -85,7 +85,7 @@ class Register extends React.Component {
   }
 
   componentWillUnmount() {
-    this.streams = disposeStreams(this.streams)
+    this.streams.dispose()
   }
 
   _validateForm() {

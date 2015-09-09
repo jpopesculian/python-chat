@@ -44,8 +44,8 @@ class Controller(object):
         return ''
 
     def json(self, obj, status=OK, headers=None):
-        headers = dict() if not type(headers) is dict else headers
-        status = 500 if not type(status) is int else status
+        headers = dict() if not isinstance(headers, dict) else headers
+        status = 500 if not isinstance(status, int) else status
         headers['Content-Type'] = 'application/json'
         return (json.dumps(obj), status, headers)
 
@@ -61,22 +61,24 @@ class Controller(object):
     def send(self, *args, **kwargs):
         return self.socket.send(*args, **kwargs)
 
-def route(url, **options):
+def route(urls, **options):
+    urls = urls if isinstance(urls, list) else [urls]
     def _route(fn):
-        def wrapper(self):
-            router = getattr(self, 'blueprint')
-            decorate = router.route(url, **options)
+        def wrapper(self, **kwargs):
 
             @functools.wraps(fn)
             def new_fn(*args, **kwargs):
                 response = fn(self, *args, **kwargs)
-                if type(response) is dict or type(response) is list:
+                if isinstance(response, dict) or isinstance(response, list):
                     return self.json(response)
-                elif type(response) is tuple:
+                elif isinstance(response, tuple):
                     return self.json(*response)
                 return response
-                
-            decorate(new_fn)
+
+            router = getattr(self, 'blueprint')
+            for url in urls:
+                decorate = router.route(url, **options)
+                decorate(new_fn)
             return new_fn
         return wrapper
     return _route

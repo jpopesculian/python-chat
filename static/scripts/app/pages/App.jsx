@@ -5,7 +5,7 @@ import Rx from 'rx'
 import StreamMap from 'app/services/stream-map'
 
 @reactMixin.decorate(Navigation)
-class Home extends React.Component {
+class App extends React.Component {
 
   constructor(props) {
     super(props)
@@ -35,4 +35,4 @@ class Home extends React.Component {
 
 }
 
-export default Home
+export default App

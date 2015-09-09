@@ -1,8 +1,7 @@
 import Rx from 'rx'
-import { forEach } from './Utils'
 import Immutable from 'immutable'
 
-class ReactSubject {
+export class ReactSubject {
 
   static create(mapFunction) {
     function subject(value) {
@@ -55,4 +54,32 @@ export function disposeStreams(streams) {
   return Immutable.Map()
 }
 
-export default ReactSubject
+export class StreamMap {
+  constructor(...streams) {
+    this.map = Immutable.Map()
+    for (let stream of streams) {
+      this.set(stream, ReactSubject.create())
+    }
+  }
+
+  set(key, value) {
+    this.map = this.map.set(key, value)
+    return this
+  }
+
+  get(key) {
+    return this.map.get(key)
+  }
+
+  dispose(key) {
+    if (key) {
+      let stream = this.get(key)
+      this.set(key, stream.dispose())
+    } else {
+      this.map = this.map.map((stream) => stream.dispose())
+    }
+    return this
+  }
+}
+
+export default StreamMap

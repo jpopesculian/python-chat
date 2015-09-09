@@ -5,8 +5,7 @@ class Anchor extends React.Component {
 
   static propTypes = {
     children: React.PropTypes.node,
-    href: React.PropTypes.string,
-    route: React.PropTypes.string
+    href: React.PropTypes.string
   }
 
   constructor(props) {
@@ -14,9 +13,9 @@ class Anchor extends React.Component {
   }
 
   render() {
-    let {href, route} = this.props
-    if (route) {
-      return <Link to={route} {...this.props}>{this.props.children}</Link>
+    let {href} = this.props
+    if (href.startsWith('/')) {
+      return <Link to={href} {...this.props}>{this.props.children}</Link>
     }
     return <a href={href} {...this.props}>{this.props.children}</a>
   }
