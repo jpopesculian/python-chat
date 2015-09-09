@@ -3,7 +3,7 @@ import Immutable from 'immutable'
 import {Navigation} from 'react-router'
 import reactMixin from 'react-mixin'
 
-import ReactSubject from 'app/services/ReactSubject'
+import { initiateStreams, disposeStreams } from 'app/services/ReactSubject'
 import Http from 'app/services/Http'
 import {extractTargetValue, isEmail} from 'app/services/Utils'
 
@@ -18,9 +18,6 @@ class Register extends React.Component {
     super(props)
     this.state = {
       form: Immutable.Map({
-        usernameError: '',
-        emailError: '',
-        passwordError: '',
         passwordHidden: true
       })
     }
@@ -28,12 +25,9 @@ class Register extends React.Component {
   }
 
   componentWillMount() {
-    this._usernameFieldStream = ReactSubject.create()
-    this._emailFieldStream = ReactSubject.create()
-    this._passwordFieldStream = ReactSubject.create()
-    this._formSubmitStream = ReactSubject.create()
+    this.streams = initiateStreams('usernameField', 'emailField', 'passwordField', 'formSubmit')
 
-    let userValues = this._usernameFieldStream.map(extractTargetValue)
+    let userValues = this.streams.get('usernameField').map(extractTargetValue)
     userValues.subscribe((value) => {
       this._formValues = this._formValues.set('username', value)
     })
@@ -41,7 +35,7 @@ class Register extends React.Component {
       .map(this._validateUsername.bind(this))
       .subscribe((error) => this.setState({form: this.state.form.set('usernameError', error)}))
 
-    let emailValues = this._emailFieldStream.map(extractTargetValue)
+    let emailValues = this.streams.get('emailField').map(extractTargetValue)
     emailValues.subscribe((value) => {
       this._formValues = this._formValues.set('email', value)
     })
@@ -49,7 +43,7 @@ class Register extends React.Component {
       .map(this._validateEmail.bind(this))
       .subscribe((error) => this.setState({form: this.state.form.set('emailError', error)}))
 
-    let passwordValues = this._passwordFieldStream.map(extractTargetValue)
+    let passwordValues = this.streams.get('passwordField').map(extractTargetValue)
     passwordValues.subscribe((value) => {
       this._formValues = this._formValues.set('password', value)
     })
@@ -57,7 +51,7 @@ class Register extends React.Component {
       .map(this._validatePassword.bind(this))
       .subscribe((error) => this.setState({form: this.state.form.set('passwordError', error)}))
 
-    this._formSubmitStream
+    this.streams.get('formSubmit')
       .map((event) => {
         event.preventDefault()
         return false
@@ -91,10 +85,7 @@ class Register extends React.Component {
   }
 
   componentWillUnmount() {
-    this._usernameFieldStream.dispose()
-    this._emailFieldStream.dispose()
-    this._passwordFieldStream.dispose()
-    this._formSubmitStream.dispose()
+    this.streams = disposeStreams(this.streams)
   }
 
   _validateForm() {
@@ -149,25 +140,25 @@ class Register extends React.Component {
   render() {
     let {form} = this.state
     return (
-      <Form onSubmit={this._formSubmitStream}>
+      <Form onSubmit={this.streams.get('formSubmit')}>
         <TextField
           error={form.get('usernameError')}
           label="username"
-          onChange={this._usernameFieldStream}
+          onChange={this.streams.get('usernameField')}
           ref="usernameField"
           type="text"
         />
         <TextField
           error={form.get('emailError')}
           label="email"
-          onChange={this._emailFieldStream}
+          onChange={this.streams.get('emailField')}
           ref="emailField"
           type="email"
         />
         <TextField
           error={form.get('passwordError')}
           label="password"
-          onChange={this._passwordFieldStream}
+          onChange={this.streams.get('passwordField')}
           ref="passwordField"
           type={form.get('passwordHidden') ? 'password' : 'text'}
         />

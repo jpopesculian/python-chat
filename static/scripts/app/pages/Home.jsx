@@ -1,7 +1,8 @@
 import React from 'react'
-import ReactSubject from 'app/services/ReactSubject'
 import reactMixin from 'react-mixin'
 import { Navigation } from 'react-router'
+import Rx from 'rx'
+import { initiateStreams, disposeStreams } from 'app/services/ReactSubject'
 
 @reactMixin.decorate(Navigation)
 class Home extends React.Component {
@@ -11,20 +12,23 @@ class Home extends React.Component {
   }
 
   componentWillMount() {
-    this._buttonClickStream = ReactSubject.create()
-    this._buttonClickStream.subscribe(() => {
+    this.streams = initiateStreams('buttonClick', 'another')
+    this.streams.get('buttonClick').subscribe(() => {
       this.transitionTo('/register')
     })
+    let secondStream = Rx.Observable.interval(500).startWith(0)
+      .subscribe((s) => this.setState({count: s}))
+    this.streams = this.streams.set('seconds', secondStream)
   }
 
   componentWillUnmount() {
-    this._buttonClickStream.dispose()
+    this.streams = disposeStreams(this.streams)
   }
 
   render() {
     return (
       <div>
-        <button onClick={this._buttonClickStream}>Transition</button>
+        <button onClick={this.streams.get('buttonClick')}>Transition {this.state.count}</button>
       </div>
     )
   }

@@ -3,7 +3,7 @@ import Immutable from 'immutable'
 import {Navigation} from 'react-router'
 import reactMixin from 'react-mixin'
 
-import ReactSubject from 'app/services/ReactSubject'
+import { initiateStreams, disposeStreams } from 'app/services/ReactSubject'
 import Http from 'app/services/Http'
 import {extractTargetValue} from 'app/services/Utils'
 
@@ -25,21 +25,19 @@ class Login extends React.Component {
   }
 
   componentWillMount() {
-    this._identifierFieldStream = ReactSubject.create()
-    this._passwordFieldStream = ReactSubject.create()
-    this._formSubmitStream = ReactSubject.create()
+    this.streams = initiateStreams('identifierField', 'passwordField', 'formSubmit')
 
-    let userValues = this._identifierFieldStream.map(extractTargetValue)
-    userValues.subscribe((value) => {
+    let identifierValues = this.streams.get('identifierField').map(extractTargetValue)
+    identifierValues.subscribe((value) => {
       this._formValues = this._formValues.set('identifier', value)
     })
 
-    let passwordValues = this._passwordFieldStream.map(extractTargetValue)
+    let passwordValues = this.streams.get('passwordField').map(extractTargetValue)
     passwordValues.subscribe((value) => {
       this._formValues = this._formValues.set('password', value)
     })
 
-    this._formSubmitStream
+    this.streams.get('formSubmit')
       .map((event) => {
         event.preventDefault()
         return false
@@ -68,24 +66,24 @@ class Login extends React.Component {
   }
 
   componentWillUnmount() {
-    this._identifierFieldStream.dispose()
-    this._passwordFieldStream.dispose()
-    this._formSubmitStream.dispose()
+    this.streams = disposeStreams(this.streams)
   }
 
   render() {
     let {form} = this.state
     return (
-      <Form onSubmit={this._formSubmitStream}>
+      <Form onSubmit={this.streams.get('formSubmit')}>
         <TextField
+          error={form.get('identifierError')}
           label="identifier"
-          onChange={this._identifierFieldStream}
+          onChange={this.streams.get('identifierField')}
           ref="identifierField"
           type="text"
         />
         <TextField
+          error={form.get('passwordError')}
           label="password"
-          onChange={this._passwordFieldStream}
+          onChange={this.streams.get('passwordField')}
           ref="passwordField"
           type={form.get('passwordHidden') ? 'password' : 'text'}
         />

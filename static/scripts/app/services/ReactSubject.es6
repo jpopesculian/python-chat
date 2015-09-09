@@ -1,5 +1,6 @@
 import Rx from 'rx'
-import {forEach} from './Utils'
+import { forEach } from './Utils'
+import Immutable from 'immutable'
 
 class ReactSubject {
 
@@ -39,5 +40,19 @@ class ReactSubject {
   }
 }
 
+export function initiateStreams(...streamNames) {
+  let streams = Immutable.Map()
+  for (let name of streamNames) {
+    streams = streams.set(name, ReactSubject.create())
+  }
+  return streams
+}
+
+export function disposeStreams(streams) {
+  streams.map((stream) => {
+    stream.dispose()
+  })
+  return Immutable.Map()
+}
 
 export default ReactSubject
