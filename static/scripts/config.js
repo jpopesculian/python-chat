@@ -28,6 +28,7 @@ System.config({
     "immutable": "npm:immutable@3.7.5",
     "react": "npm:react@0.14.0-beta3",
     "react-dom": "npm:react-dom@0.14.0-beta3",
+    "react-mixin": "npm:react-mixin@1.7.0",
     "react-router": "npm:react-router@1.0.0-beta4",
     "rx": "npm:rx@3.1.2",
     "socket.io-client": "npm:socket.io-client@1.3.6",
@@ -438,6 +439,10 @@ System.config({
     "npm:react-dom@0.14.0-beta3": {
       "fbjs": "npm:fbjs@0.1.0-alpha.4",
       "react": "npm:react@0.14.0-beta3"
+    },
+    "npm:react-mixin@1.7.0": {
+      "object-assign": "npm:object-assign@2.1.1",
+      "smart-mixin": "npm:smart-mixin@1.2.1"
     },
     "npm:react-router@1.0.0-beta4": {
       "history": "npm:history@1.8.4",

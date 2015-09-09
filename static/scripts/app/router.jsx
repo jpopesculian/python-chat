@@ -9,6 +9,7 @@ let router = (
   <Router>
     <Route path='/' getComponents={lazyLoader.component('Home')} />
     <Route path='/register' getComponents={lazyLoader.component('auth/Register')} />
+    <Route path='/login' getComponents={lazyLoader.component('auth/Login')} />
   </Router>
 );
 

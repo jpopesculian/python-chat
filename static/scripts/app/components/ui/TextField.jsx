@@ -1,6 +1,13 @@
-import React from 'react';
+import React from 'react'
 
 class TextField extends React.Component {
+
+  static propTypes = {
+    children: React.PropTypes.node,
+    error: React.PropTypes.string,
+    label: React.PropTypes.string
+  }
+
   constructor(props) {
     super(props)
   }

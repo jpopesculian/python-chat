@@ -1,7 +1,9 @@
 import xhr from 'xhr'
 import JWT from './JWT'
 import Rx from 'rx'
+import {forEach} from './Utils'
 import { HOST } from 'app/config/general'
+import { AUTH_HEADER_NAME } from 'app/config/auth'
 
 class Http {
 
@@ -22,12 +24,14 @@ class Http {
     return this.request('DELETE', url, data, args)
   }
 
-  static request(method, url, data={}, args={}) {
-    url = this.addBaseUrl(url);
-    let observable = Rx.Observable.create(function (observer) {
+  static request(method, url, data = {}, args = {}) {
+    url = this.addBaseUrl(url)
+    let observable = Rx.Observable.create(function(observer) {
       let headers = {}
       let authorization = JWT.key
-      if (authorization) headers = {authorization}
+      if (authorization) {
+        headers = { authorization }
+      }
       let options = {
         method: method,
         url: url,
@@ -38,8 +42,8 @@ class Http {
       options = Object.assign(options, args)
       xhr(options, (err, res, body) => {
         let response = {err, res, body}
-        if (res.statusCode == 200) {
-          JWT.key = res.headers.authorization
+        if (res.statusCode === 200) {
+          JWT.key = res.headers[AUTH_HEADER_NAME]
           observer.onNext(response)
         } else {
           observer.onError(response)
@@ -51,19 +55,21 @@ class Http {
   }
 
   static addBaseUrl(url) {
-    let baseUrl = url.charAt(0) == '/' ? HOST : '';
-    return baseUrl + url;
+    let baseUrl = url.charAt(0) === '/' ? HOST : ''
+    return baseUrl + url
   }
 
   static addGetParamsUrl(url, params) {
-    if (!params) return url
-    for (let param in params) {
-      let value = encodeURIComponent(JSON.stringify(params[param]))
-      let seperator = url.split('?').length > 1 ? '&' : '?'
-      url += seperator + param + '=' + value
+    if (!params) {
+      return url
     }
+    forEach(params, (param, value) => {
+      let uriValue = encodeURIComponent(JSON.stringify(value))
+      let seperator = url.split('?').length > 1 ? '&' : '?'
+      url += seperator + param + '=' + uriValue
+    })
     return url
   }
 }
 
-export default Http;
+export default Http

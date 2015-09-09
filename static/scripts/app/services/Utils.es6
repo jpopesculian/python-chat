@@ -1,86 +1,104 @@
-class Utils {
+import Rx from 'rx'
 
+class _UuidGenerator {
   constructor() {
     this.uuid = 0
   }
-
-  newUuid() {
+  next() {
     let uuid = this.uuid
     this.uuid += 1
     return uuid
   }
+}
+export var uuidGenerator = new _UuidGenerator()
 
-  isEmpty(obj) {
-    if (obj == null) return true;
-    if (obj.length > 0) return false;
-    if (obj.length === 0)  return true;
-    if (Object.getOwnPropertyNames(obj).length > 0) return false;
-    return true;
+export function isEmpty(obj) {
+  if (obj === null) {
+    return true
   }
-
-  isNull(obj) {
-    return obj === null
+  if (obj.length > 0) {
+    return false
   }
-
-  isDefined(x) {
-    return (x || (x !== undefined && !isNull(x)))
+  if (obj.length === 0) {
+    return true
   }
-
-  isObj(obj) {
-    return !isNull(obj) && typeof obj === 'object'
+  if (Object.getOwnPropertyNames(obj).length > 0) {
+    return false
   }
+  return true
+}
 
-  isDict(dict) {
-    return this.isObj(dict) && !this.isArr(dict)
+export function isNull(obj) {
+  return obj === null
+}
+
+export function isDefined(x) {
+  return (x || (x !== undefined && !isNull(x)))
+}
+
+export function isObj(obj) {
+  return !isNull(obj) && typeof obj === 'object'
+}
+
+export function isArr(arr) {
+  return Array.isArray(arr)
+}
+
+export function isDict(dict) {
+  return isObj(dict) && !isArr(dict)
+}
+
+export function isStr(str) {
+  return typeof str === 'string'
+}
+
+export function isFunc(fn) {
+  return typeof fn === 'function'
+}
+
+export function isNum(n) {
+  return Number(n) === n
+}
+
+export function isInt(n) {
+  return this.isNum(n) && n % 1 === 0
+}
+
+export function isFloat(n) {
+  return this.isNum(n) && n % 1 !== 0
+}
+
+export function isEmail(email) {
+  if (!this.isStr(email)) {
+    return false
   }
+  let emailRe = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
+  return emailRe.test(email)
+}
 
-  isArr(arr) {
-    return Array.isArray(arr)
-  }
+export function pop(obj, key) {
+  let value = obj[key]
+  delete obj[key]
+  return value
+}
 
-  isStr(str) {
-    return typeof str === 'string'
-  }
+export function extractTargetValue(event) {
+  return event.target.value
+}
 
-  isFunc(fn) {
-    return typeof fn === 'function'
-  }
-
-  isNum(n) {
-    return Number(n) === n
-  }
-
-  isInt(n) {
-    return this.isNum(n) && n % 1 === 0;
-  }
-
-  isFloat(n) {
-      return this.isNum(n) && n % 1 !== 0;
-  }
-
-  isEmail(email) {
-    if (!this.isStr(email)) return false
-    let email_re = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
-    return email_re.test(email)
-  }
-
-  pop(obj, key) {
-    let value = obj[key]
-    delete obj[key]
-    return value
-  }
-
-  extractTargetValue(event) {
-    return event.target.value
-  }
-
-  AND(x, y) {
-    return (x & y) == 1
-  }
-
-  OR(x, y) {
-    return (x | y) == 1
+export function forEach(obj, cb) {
+  for (let key in obj) {
+    if ({}.hasOwnProperty.call(obj, key)) {
+      let value = obj[key]
+      cb(key, value)
+    }
   }
 }
 
-export default new Utils()
+export function forEachAsync(obj) {
+  let subject = new Rx.Subject()
+  forEach(obj, (key, value) => {
+    subject.onNext({key, value})
+  })
+  return subject
+}

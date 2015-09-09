@@ -1,16 +1,17 @@
 import React from 'react'
-import Rx from 'rx'
 import Immutable from 'immutable'
-import validator from 'validator'
+import {Navigation} from 'react-router'
+import reactMixin from 'react-mixin'
 
 import ReactSubject from 'app/services/ReactSubject'
 import Http from 'app/services/Http'
-import Utils from 'app/services/Utils'
+import {extractTargetValue, isEmail} from 'app/services/Utils'
 
 import TextField from 'app/components/ui/TextField'
 import Button from 'app/components/ui/Button'
 import Form from 'app/components/ui/Form'
 
+@reactMixin.decorate(Navigation)
 class Register extends React.Component {
 
   constructor(props) {
@@ -26,57 +27,35 @@ class Register extends React.Component {
     this._formValues = Immutable.Map()
   }
 
-  render() {
-    let {form} = this.state
-    return (
-      <Form onSubmit={this._formSubmitStream}>
-        <TextField label="username"
-          type="text"
-          onChange={this._usernameFieldStream}
-          error={form.get('usernameError')}
-          ref="usernameField"
-          />
-        <TextField label="email"
-          type="email"
-          onChange={this._emailFieldStream}
-          error={form.get('emailError')}
-          ref="emailField"
-        />
-        <TextField label="password"
-          type={this.state.passwordHidden ? 'password' : 'text'}
-          onChange={this._passwordFieldStream}
-          error={form.get('passwordError')}
-          ref="passwordField"
-        />
-        <Button type="submit">Submit</Button>
-      </Form>
-    );
-  }
-
   componentWillMount() {
-    this._registerButtonClickStream = ReactSubject.create()
     this._usernameFieldStream = ReactSubject.create()
     this._emailFieldStream = ReactSubject.create()
     this._passwordFieldStream = ReactSubject.create()
     this._formSubmitStream = ReactSubject.create()
 
-    let userValues = this._usernameFieldStream.map(Utils.extractTargetValue)
+    let userValues = this._usernameFieldStream.map(extractTargetValue)
     userValues.subscribe((value) => {
       this._formValues = this._formValues.set('username', value)
     })
-    userValues.debounce(300).subscribe(this._validateUsername.bind(this))
+    userValues.debounce(300)
+      .map(this._validateUsername.bind(this))
+      .subscribe((error) => this.setState({form: this.state.form.set('usernameError', error)}))
 
-    let emailValues = this._emailFieldStream.map(Utils.extractTargetValue)
+    let emailValues = this._emailFieldStream.map(extractTargetValue)
     emailValues.subscribe((value) => {
       this._formValues = this._formValues.set('email', value)
     })
-    emailValues.debounce(300).subscribe(this._validateEmail.bind(this))
+    emailValues.debounce(300)
+      .map(this._validateEmail.bind(this))
+      .subscribe((error) => this.setState({form: this.state.form.set('emailError', error)}))
 
-    let passwordValues = this._passwordFieldStream.map(Utils.extractTargetValue)
+    let passwordValues = this._passwordFieldStream.map(extractTargetValue)
     passwordValues.subscribe((value) => {
       this._formValues = this._formValues.set('password', value)
     })
-    passwordValues.debounce(300).subscribe(this._validatePassword.bind(this))
+    passwordValues.debounce(300)
+      .map(this._validatePassword.bind(this))
+      .subscribe((error) => this.setState({form: this.state.form.set('passwordError', error)}))
 
     this._formSubmitStream
       .map((event) => {
@@ -93,56 +72,108 @@ class Register extends React.Component {
           console.log(response)
         },
         (error) => {
-          console.error(error)
+          let code = error.body.error
+          let errorMessage = ''
+          switch (code) {
+          case 'user_exists':
+            errorMessage = 'Username or Email already exists'
+            this.setState({form: this.state.form.set('usernameError', errorMessage)})
+            break
+          case 'invalid_password':
+            errorMessage = 'Password Invalid'
+            this.setState({form: this.state.form.set('passwordError', errorMessage)})
+            break
+          default:
+            errorMessage = 'User could not be created'
+            this.setState({form: this.state.form.set('usernameError', errorMessage)})
+          }
         })
   }
 
+  componentWillUnmount() {
+    this._usernameFieldStream.dispose()
+    this._emailFieldStream.dispose()
+    this._passwordFieldStream.dispose()
+    this._formSubmitStream.dispose()
+  }
+
   _validateForm() {
-    let valid = true
-    valid = Utils.AND(this._validateUsername(this._formValues.get('username')), valid)
-    valid = Utils.AND(this._validateEmail(this._formValues.get('email')), valid)
-    valid = Utils.AND(this._validatePassword(this._formValues.get('password')), valid)
-    return valid
+    let usernameError = this._validateUsername(this._formValues.get('username'))
+    let emailError = this._validateEmail(this._formValues.get('email'))
+    let passwordError = this._validatePassword(this._formValues.get('password'))
+    let formErrors = this.state.form
+      .set('usernameError', usernameError)
+      .set('emailError', emailError)
+      .set('passwordError', passwordError)
+    this.setState({form: formErrors })
+    return !usernameError && !emailError && !passwordError
   }
 
   _validateUsername(username) {
     let error = ''
-    let username_re = /^[a-zA-Z0-9][a-zA-Z0-9_\-+\.]*[a-zA-Z0-9]$/
+    let usernameRe = /^[a-zA-Z0-9][a-zA-Z0-9_\-+\.]*[a-zA-Z0-9]$/
     if (!username) {
       error = 'Required'
     } else if (username.length < 3) {
       error = 'Must be at least 3 characters long'
     } else if (username.length > 64) {
-      error = "Must be less than 64 characters long"
-    } else if (!username_re.test(username)) {
+      error = 'Must be less than 64 characters long'
+    } else if (!usernameRe.test(username)) {
       error = 'May only contain numbers, letters and + . - or _'
     }
-    this.setState({form: this.state.form.set('usernameError', error)})
-    return !error
+    return error
   }
 
   _validateEmail(email) {
     let error = ''
     if (!email) {
       error = 'Required'
-    } else if (!Utils.isEmail(email)) {
+    } else if (!isEmail(email)) {
       error = 'Must be a valid email address'
     }
-    this.setState({form: this.state.form.set('emailError', error)})
-    return !error
+    return error
   }
 
   _validatePassword(password) {
     let error = ''
     if (!password) {
-      password = 'Required'
-    } if (password.length < 5) {
+      error = 'Required'
+    } else if (password.length < 5) {
       error = 'Must be at least 5 characters long'
     } else if (password.length > 64) {
-      error = "Must be less than 64 characters long"
+      error = 'Must be less than 64 characters long'
     }
-    this.setState({form: this.state.form.set('passwordError', error)})
-    return !error
+    return error
+  }
+
+  render() {
+    let {form} = this.state
+    return (
+      <Form onSubmit={this._formSubmitStream}>
+        <TextField
+          error={form.get('usernameError')}
+          label="username"
+          onChange={this._usernameFieldStream}
+          ref="usernameField"
+          type="text"
+        />
+        <TextField
+          error={form.get('emailError')}
+          label="email"
+          onChange={this._emailFieldStream}
+          ref="emailField"
+          type="email"
+        />
+        <TextField
+          error={form.get('passwordError')}
+          label="password"
+          onChange={this._passwordFieldStream}
+          ref="passwordField"
+          type={form.get('passwordHidden') ? 'password' : 'text'}
+        />
+        <Button type="submit">Submit</Button>
+      </Form>
+    )
   }
 
 }

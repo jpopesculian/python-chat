@@ -1,4 +1,5 @@
 import EventQueue from './EventQueue'
+import {forEach} from './Utils'
 
 class LazyLoader {
 
@@ -20,16 +21,16 @@ class LazyLoader {
   }
 
   components(paths) {
-    for (let path in paths) {
-      paths[path] = this._updatePath(paths[path])
-      this._importLater(paths[path])
-    }
+    forEach(paths, (name, path) => {
+      paths[name] = this._updatePath(path)
+      this._importLater(path)
+    })
     let modules = []
     let moduleNames = []
-    for (let path in paths) {
-      modules.push(paths[path])
-      moduleNames.push(path)
-    }
+    forEach(paths, (name, path) => {
+      modules.push(path)
+      moduleNames.push(name)
+    })
     return (cb) => {
       this._multiImport(modules)
         .then((components) => {
@@ -51,7 +52,9 @@ class LazyLoader {
   }
 
   _importLater(path) {
-    if (this.hold) return this.queue.add(this._import.bind(this, path))
+    if (this.hold) {
+      return this.queue.add(this._import.bind(this, path))
+    }
     return this._import(path)
   }
 
@@ -61,7 +64,9 @@ class LazyLoader {
   }
 
   _updatePath(path) {
-    if (path.startsWith('/') || path.startsWith('.')) return path
+    if (path.startsWith('/') || path.startsWith('.')) {
+      return path
+    }
     return this.pathBase + path
   }
 }

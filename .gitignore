@@ -9,8 +9,10 @@ www
 # local config
 api/config/local.py
 local
-.pylintrc
-.eslintrc
+
+# editor config
+# .pylintrc
+# .eslintrc
 
 ######################
 # PYTHON STUFF BELOW #

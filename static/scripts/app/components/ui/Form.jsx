@@ -1,6 +1,11 @@
-import React from 'react';
+import React from 'react'
 
 class Form extends React.Component {
+
+  static propTypes = {
+    children: React.PropTypes.node
+  }
+
   constructor(props) {
     super(props)
   }

@@ -1,7 +1,14 @@
-import React from 'react';
-import {Link} from 'react-router';
+import React from 'react'
+import {Link} from 'react-router'
 
 class Anchor extends React.Component {
+
+  static propTypes = {
+    children: React.PropTypes.node,
+    href: React.PropTypes.string,
+    route: React.PropTypes.string
+  }
+
   constructor(props) {
     super(props)
   }

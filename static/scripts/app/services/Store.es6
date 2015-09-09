@@ -1,13 +1,13 @@
 import Rx from 'rx'
-import Utils from './Utils'
+import {isDefined, isNull, isFunc, isStr, isInt, isFloat, isNum} from './Utils'
 import LocalStorage from './LocalStorage'
 import Immutable from 'immutable'
 
 class Store {
 
-  constructor(config, namespace) {
+  constructor(configObj, namespace) {
     this.namespace = namespace ? namespace : 'root'
-    this._config = Immutable.fromJS(config)
+    this._config = Immutable.fromJS(configObj)
     this._store = {}
     this._actionStreams = Immutable.Map()
     this._valueStreams = Immutable.Map()
@@ -16,14 +16,14 @@ class Store {
 
     this._config.map((config, key) => {
       // get initial value
-      let value = undefined
-      if (Utils.isDefined(config.get('startWith'))) {
+      let value
+      if (isDefined(config.get('startWith'))) {
         value = config.get('startWith')
       }
       if (config.get('persist')) {
         let locallyStored = LocalStorage.get(this._storageKey(key))
         locallyStored = this._deserialize(key, locallyStored)
-        value = !Utils.isNull(locallyStored) ? locallyStored : value
+        value = !isNull(locallyStored) ? locallyStored : value
       }
       this._store[key] = value
 
@@ -31,10 +31,10 @@ class Store {
       let valueStream = new Rx.Subject()
       let actionStream = new Rx.Subject()
 
-      let transform = Utils.isFunc(config.get('transform')) ?
+      let transform = isFunc(config.get('transform')) ?
         config.get('transform') : (old, update) => update
-      let updateStream = actionStream.withLatestFrom(valueStream, (action, value) => {
-        let newValue = transform(value, action.value, action.op)
+      let updateStream = actionStream.withLatestFrom(valueStream, (action, oldValue) => {
+        let newValue = transform(oldValue, action.value, action.op)
         valueStream.onNext(newValue)
         return {value: newValue, action: action}
       })
@@ -101,7 +101,7 @@ class Store {
       return false
     }
     let type = config.get('type')
-    if (type && Utils.isFunc(type.validator) && !type.validator(value)) {
+    if (type && isFunc(type.validator) && !type.validator(value)) {
       return false
     }
     return true
@@ -110,7 +110,7 @@ class Store {
   _serialize(key, value) {
     let config = this._config.get(key)
     let type = config.get('type')
-    if (type && Utils.isFunc(type.serialize)) {
+    if (type && isFunc(type.serialize)) {
       return type.serialize(value)
     }
     return value
@@ -119,7 +119,7 @@ class Store {
   _deserialize(key, value) {
     let config = this._config.get(key)
     let type = config.get('type')
-    if (type && Utils.isFunc(type.deserialize)) {
+    if (type && isFunc(type.deserialize)) {
       return type.deserialize(value)
     }
     return value
@@ -129,16 +129,16 @@ class Store {
 
 export const types = {
   STR: {
-    validator: Utils.isStr,
+    validator: isStr
   },
   INT: {
-    validator: Utils.isInt,
+    validator: isInt
   },
   FLOAT: {
-    validator: Utils.isFloat,
+    validator: isFloat
   },
   NUM: {
-    validator: Utils.isNUm,
+    validator: isNum
   },
   LIST: {
     validator: Immutable.List.isList,

@@ -1,4 +1,4 @@
-import Utils from './Utils'
+import {uuidGenerator} from './Utils'
 
 class EventQueue {
 
@@ -7,7 +7,7 @@ class EventQueue {
   }
 
   add(fn) {
-    let uuid = Utils.newUuid()
+    let uuid = uuidGenerator.next()
     this.queue[uuid] = fn
     return uuid
   }
@@ -28,11 +28,14 @@ class EventQueue {
   execute(context) {
     context = context || this
     let args = Array.from(arguments)
-    if (args.length > 1) args.shift()
-    for (let uuid in this.queue) {
-      let fn = this.queue[uuid]
-      fn.apply(context, args)
+    if (args.length > 1) {
+      args.shift()
     }
+    Utils.forEachAsync(this.queue)
+      .subscribe((entry) => {
+        let fn = entry.value
+        fn.apply(context, args)
+      })
   }
 
 }

@@ -1,8 +1,11 @@
-import React from 'react';
-
-import Anchor from './Anchor'
+import React from 'react'
 
 class Button extends React.Component {
+
+  static propTypes = {
+    children: React.PropTypes.node
+  }
+
   constructor(props) {
     super(props)
   }
