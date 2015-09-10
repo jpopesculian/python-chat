@@ -1,0 +1,12 @@
+{
+  "stage": 0,
+  "loose": "all",
+  "nonStandard": true,
+  "modules": "system",
+  "optional": [
+    "es6.spec.blockScoping",
+    "es6.spec.symbols",
+    "es6.spec.templateLiterals",
+    "runtime"
+  ],
+}

@@ -1,5 +1,3 @@
-import Rx from 'rx'
-
 class _UuidGenerator {
   constructor() {
     this.uuid = 0
@@ -86,19 +84,11 @@ export function extractTargetValue(event) {
   return event.target.value
 }
 
-export function forEach(obj, cb) {
+export function* forEach(obj) {
   for (let key in obj) {
-    if ({}.hasOwnProperty.call(obj, key)) {
+    if (obj.hasOwnProperty(key)) {
       let value = obj[key]
-      cb(key, value)
+      yield {key, value}
     }
   }
-}
-
-export function forEachAsync(obj) {
-  let subject = new Rx.Subject()
-  forEach(obj, (key, value) => {
-    subject.onNext({key, value})
-  })
-  return subject
 }

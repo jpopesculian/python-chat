@@ -5,14 +5,20 @@ import {createHistory} from 'history'
 import LazyLoader from './services/lazy-loader'
 
 let history = createHistory()
-let lazyLoader = new LazyLoader('app/pages/')
+let ll = new LazyLoader('app/pages/')
 
 let router = (
   <Router history={history}>
-    <Route path='/' getComponents={lazyLoader.component('Home')} />
-    <Route path='/register' getComponents={lazyLoader.component('auth/Register')} />
-    <Route path='/login' getComponents={lazyLoader.component('auth/Login')} />
-    <Route path='/app' getComponents={lazyLoader.component('App')} />
+    <Route getComponents={ll.component('Home')}
+      path='/'/>
+    <Route getComponents={ll.component('auth/Register')}
+      path='/register'/>
+    <Route getComponents={ll.component('auth/Login')}
+      path='/login'/>
+    <Route getComponents={ll.component('App')}>
+      <Route getComponents={ll.components({main: 'app/Room', sidebar: 'app/Sidebar'})}
+        path='/messages'/>
+    </Route>
   </Router>
 )
 

@@ -63,11 +63,11 @@ class Http {
     if (!params) {
       return url
     }
-    forEach(params, (param, value) => {
+    for (let {key, value} of forEach(params)) {
       let uriValue = encodeURIComponent(JSON.stringify(value))
       let seperator = url.split('?').length > 1 ? '&' : '?'
-      url += seperator + param + '=' + uriValue
-    })
+      url += seperator + key + '=' + uriValue
+    }
     return url
   }
 }

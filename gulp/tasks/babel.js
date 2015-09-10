@@ -12,17 +12,7 @@ module.exports = function (gulp, plugins, mode) {
                     .pipe(plugins.changed(settings.static_dest))
                     .pipe(plugins.preprocess({context: settings.env.dev}))
                     .pipe(plugins.sourcemaps.init())
-                    .pipe(plugins.babel({
-                      "stage": 0,
-                      "loose": "all",
-                      "nonStandard": true,
-                      "modules": "system",
-                      "optional": [
-                        "es6.spec.blockScoping",
-                        "es6.spec.symbols",
-                        "es6.spec.templateLiterals"
-                      ],
-                    }))
+                    .pipe(plugins.babel())
                     .pipe(plugins.sourcemaps.write())
                     .pipe(gulp.dest(settings.static_dest))
                     .pipe(plugins.livereload());
@@ -34,17 +24,7 @@ module.exports = function (gulp, plugins, mode) {
                 gulp.src(settings.static_src + 'scripts/**/*.' + file_ext,
                     {base: settings.static_src})
                     .pipe(plugins.preprocess({context: settings.env.prod}))
-                    .pipe(plugins.babel({
-                      "stage": 0,
-                      "loose": "all",
-                      "nonStandard": true,
-                      "modules": "system",
-                      "optional": [
-                        "es6.spec.blockScoping",
-                        "es6.spec.symbols",
-                        "es6.spec.templateLiterals"
-                      ],
-                    }))
+                    .pipe(plugins.babel())
                     .pipe(plugins.uglify())
                     .pipe(gulp.dest(settings.static_dest));
             });

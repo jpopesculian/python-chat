@@ -24,7 +24,7 @@ module.exports = function (gulp, plugins, mode) {
                 .pipe(plugins.livereload());
         },
         misc: function () {
-            var file_exts = ['txt', 'ico', 'config', 'md'];
+            var file_exts = ['txt', 'ico', 'config', 'md', 'json'];
             file_exts.forEach(function(file_ext) {
                 gulp.src(settings.static_src + '**/*.' + file_ext,
                     {base: settings.static_src})

@@ -34,8 +34,11 @@
       "baseURL": "static/scripts"
     },
     "dependencies": {
+      "babel-runtime": "npm:babel-runtime@^5.1.13",
+      "color": "npm:color@^0.10.1",
       "history": "npm:history@^1.8.4",
       "immutable": "npm:immutable@^3.7.5",
+      "radium": "npm:radium@^0.13.8",
       "react": "npm:react@^0.14.0-beta1",
       "react-dom": "npm:react-dom@^0.14.0-beta1",
       "react-mixin": "npm:react-mixin@^1.7.0",
@@ -50,14 +53,7 @@
       "core-js": "npm:core-js@^0.9.4"
     }
   },
-  "eslintConfig": {
-    "ecmaFeatures": {
-      "jsx": true,
-      "modules": true
-    },
-    "env": {
-      "browser": true,
-      "es6": true
-    }
+  "babel": {
+    "babelrc": "./.babelrc"
   }
 }

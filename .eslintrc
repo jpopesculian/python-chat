@@ -28,7 +28,7 @@ rules:
     #                                                                         #
     ###########################################################################
 
-    comma-dangle: [2, "never"] # disallow trailing commas in object literals
+    comma-dangle: [1, "never"] # disallow trailing commas in object literals
     no-cond-assign: 2          # disallow assignment in conditional expressions
     no-console: 1              # disallow use of console
     no-constant-condition: 2   # disallow use of constant expressions in conditions
@@ -150,7 +150,7 @@ rules:
     no-undefined: 0                # disallow use of undefined variable
     no-unused-vars: 2              # disallow declaration of variables that are not used in
                                    #    the code
-    no-use-before-define: 2        # disallow use of variables before they are defined
+    no-use-before-define: 0        # disallow use of variables before they are defined
 
     ###########################################################################
     #                                                                         #

@@ -21,16 +21,16 @@ class LazyLoader {
   }
 
   components(paths) {
-    forEach(paths, (name, path) => {
-      paths[name] = this._updatePath(path)
-      this._importLater(path)
-    })
+    for (let {key, value} of forEach(paths)) {
+      paths[key] = this._updatePath(value)
+      this._importLater(value)
+    }
     let modules = []
     let moduleNames = []
-    forEach(paths, (name, path) => {
-      modules.push(path)
-      moduleNames.push(name)
-    })
+    for (let {key, value} of forEach(paths)) {
+      modules.push(value)
+      moduleNames.push(key)
+    }
     return (cb) => {
       this._multiImport(modules)
         .then((components) => {
@@ -38,7 +38,7 @@ class LazyLoader {
           for (let i = 0; i < components.length; i++) {
             result[moduleNames[i]] = components[i].default
           }
-          console.log(result)
+          cb(null, result)
         })
     }
   }

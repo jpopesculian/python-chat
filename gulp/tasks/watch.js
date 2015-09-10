@@ -14,11 +14,11 @@ module.exports = function (gulp, plugins, mode) {
             gulp.watch(settings.static_src + 'styles/**/*.scss', ['sass:dev']);
         },
         babel: function () {
-            gulp.watch(settings.static_src + 'scripts/**/*.es6', ['babel:dev']);
-            gulp.watch(settings.static_src + 'scripts/**/*.jsx', ['babel:dev']);
+            gulp.watch(settings.static_src + 'scripts/app/**/*.es6', ['babel:dev']);
+            gulp.watch(settings.static_src + 'scripts/app/**/*.jsx', ['babel:dev']);
         },
         javascript: function () {
-            gulp.watch(settings.static_src + 'scripts/**/*.js', ['javascript:dev']);
+            gulp.watch(settings.static_src + 'scripts/app/**/*.js', ['javascript:dev']);
         },
         html: function () {
             gulp.watch(settings.static_src + '**/*.html', ['html:dev']);
