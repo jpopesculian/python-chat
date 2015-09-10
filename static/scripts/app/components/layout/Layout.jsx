@@ -8,15 +8,16 @@ import Immutable from 'immutable'
 class Layout extends React.Component {
 
   static propTypes = {
-    alignment: React.PropTypes.oneOfType([
-      React.PropTypes.array,
+    align: React.PropTypes.array,
+    alignCross: React.PropTypes.oneOfType([
+      React.PropTypes.oneOf(['start', 'center', 'end', 'baseline', 'stretch']),
+      React.PropTypes.object
+    ]),
+    alignMain: React.PropTypes.oneOfType([
+      React.PropTypes.oneOf(['start', 'center', 'end', 'spaceAround', 'spaceBetween']),
       React.PropTypes.object
     ]),
     children: React.PropTypes.node,
-    defaults: React.PropTypes.oneOfType([
-      React.PropTypes.array,
-      React.PropTypes.object
-    ]),
     height: React.PropTypes.oneOfType([
       React.PropTypes.oneOf(['view', 'full', 'auto']),
       React.PropTypes.object
@@ -25,18 +26,23 @@ class Layout extends React.Component {
       React.PropTypes.oneOf(['row', 'column']),
       React.PropTypes.object
     ]),
-    space: React.PropTypes.oneOfType([
-      React.PropTypes.oneOf(['around', 'between', 'none']),
+    spacing: React.PropTypes.oneOfType([
+      React.PropTypes.oneOf(['start', 'stretch', 'center', 'end', 'spaceAround', 'spaceBetween']),
+      React.PropTypes.object
+    ]),
+    wrap: React.PropTypes.oneOfType([
+      React.PropTypes.oneOf(['auto', 'none', 'reverse']),
       React.PropTypes.object
     ])
   }
 
   static defaultProps = {
-    alignment: ['start', 'start'],
-    defaults: ['auto', 'auto'],
+    alignCross: 'start',
+    alignMain: 'start',
     height: 'auto',
     kind: 'row',
-    space: 'none'
+    spacing: 'start',
+    wrap: 'auto'
   }
 
   constructor(props) {
@@ -44,31 +50,79 @@ class Layout extends React.Component {
   }
 
 
-  _heightStyle() {
-    if (!isObj(this.props.height)) {
-      return styles.get('heights')[this.props.height]
+  _extractStyle(propName) {
+    let prop = this.props[propName]
+    let options = styles.get(propName)
+    if (!isObj(prop)) {
+      return Object.assign({}, options[prop])
     }
-    let style = styles.get('heights')['auto']
-    for (let {key, value} of forEach(this.props.height)) {
-      style[getBreakpoint(key)] = styles.get('heights')[value]
+    let defaultValue = Layout.defaultProps[propName]
+    let style = Object.assign({}, options[defaultValue])
+    for (let {key, value} of forEach(prop)) {
+      style[getBreakpoint(key)] = Object.assign({}, options[value])
     }
     return style
   }
 
   render() {
-    let heightStyle = this._heightStyle()
-    let compiledStyles = [styles.get('base'), heightStyle]
-    console.log(compiledStyles)
+    if (this.props.align && this.props.align.length > 1) {
+      this.props.alignMain = this.props.align[0]
+      this.props.alignCross = this.props.align[1]
+    }
+    let compiledStyles = [
+      styles.get('base'),
+      this._extractStyle('alignCross'),
+      this._extractStyle('alignMain'),
+      this._extractStyle('height'),
+      this._extractStyle('kind'),
+      this._extractStyle('spacing'),
+      this._extractStyle('wrap')
+    ]
     return <div style={compiledStyles}>Layout</div>
   }
 
 }
 
 var styles = Immutable.Map({
+  alignMain: {
+    start: {
+      justifyContent: 'flex-start'
+    },
+    center: {
+      justifyContent: 'center'
+    },
+    end: {
+      justifyContent: 'flex-end'
+    },
+    spaceAround: {
+      justifyContent: 'space-around'
+    },
+    spaceBetween: {
+      justifyContent: 'space-between'
+    }
+  },
+  alignCross: {
+    start: {
+      alignItems: 'flex-start'
+    },
+    center: {
+      alignItems: 'center'
+    },
+    end: {
+      alignItems: 'flex-end'
+    },
+    baseline: {
+      alignItems: 'baseline'
+    },
+    stretch: {
+      alignItems: 'stretch'
+    }
+  },
   base: {
+    display: ['flex', '-webkit-flex'],
     background: 'red'
   },
-  heights: {
+  height: {
     full: {
       height: '100%'
     },
@@ -77,6 +131,45 @@ var styles = Immutable.Map({
     },
     view: {
       height: '100vh'
+    }
+  },
+  kind: {
+    column: {
+      flexDirection: 'column'
+    },
+    row: {
+      flexDirection: 'row'
+    }
+  },
+  spacing: {
+    start: {
+      alignContent: 'flex-start'
+    },
+    center: {
+      alignContent: 'center'
+    },
+    stretch: {
+      alignContent: 'stretch'
+    },
+    end: {
+      alignContent: 'flex-end'
+    },
+    spaceAround: {
+      alignContent: 'space-around'
+    },
+    spaceBetween: {
+      alignContent: 'space-between'
+    }
+  },
+  wrap: {
+    auto: {
+      flexWrap: 'wrap'
+    },
+    none: {
+      flexWrap: 'nowrap'
+    },
+    reverse: {
+      flexWrap: 'wrap-reverse'
     }
   }
 })

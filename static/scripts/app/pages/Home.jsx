@@ -12,7 +12,7 @@ class Home extends React.Component {
 
   render() {
     return (
-      <Layout height={{xs: 'full', md: 'auto'}}/>
+      <Layout height={{xs: 'full', md: 'auto'}} kind='column'/>
     )
   }
 

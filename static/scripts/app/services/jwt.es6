@@ -1,4 +1,4 @@
-import LocalStorage from './LocalStorage'
+import LocalStorage from './local-storage'
 import { AUTH_STORAGE_NAME } from 'app/config/auth'
 
 class JWT {

@@ -32,7 +32,7 @@ class Register extends React.Component {
       this._formValues = this._formValues.set('username', value)
     })
     userValues.debounce(300)
-      .map(this._validateUsername.bind(this))
+      .map(::this._validateUsername)
       .subscribe((error) => this.setState({form: this.state.form.set('usernameError', error)}))
 
     let emailValues = this.streams.get('emailField').map(extractTargetValue)
@@ -40,7 +40,7 @@ class Register extends React.Component {
       this._formValues = this._formValues.set('email', value)
     })
     emailValues.debounce(300)
-      .map(this._validateEmail.bind(this))
+      .map(::this._validateEmail)
       .subscribe((error) => this.setState({form: this.state.form.set('emailError', error)}))
 
     let passwordValues = this.streams.get('passwordField').map(extractTargetValue)
@@ -48,7 +48,7 @@ class Register extends React.Component {
       this._formValues = this._formValues.set('password', value)
     })
     passwordValues.debounce(300)
-      .map(this._validatePassword.bind(this))
+      .map(::this._validatePassword)
       .subscribe((error) => this.setState({form: this.state.form.set('passwordError', error)}))
 
     this.streams.get('formSubmit')
@@ -56,7 +56,7 @@ class Register extends React.Component {
         event.preventDefault()
         return false
       })
-      .filter(this._validateForm.bind(this))
+      .filter(::this._validateForm)
       .flatMap(() => {
         let data = this._formValues.toObject()
         return Http.post('/api/v1/auth/local/register', data)
