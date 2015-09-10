@@ -1,7 +1,7 @@
 # Build Resources
 node_modules
 **jspm_packages**
-# static/scripts/config.js
+static/scripts/config.js
 
 # Build files
 www
