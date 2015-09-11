@@ -1,10 +1,10 @@
-from api.core import Model, Base
+from api.core.database import Model, Base, WithId, WithTimeStamp
 from api.utils.crypto import hash_pw, check_pw
 from sqlalchemy import Column, Integer, String, ForeignKey, Index
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
 
-class Passport(Model, Base):
+class Passport(Base, Model, WithId, WithTimeStamp):
 
     user_id = Column(Integer, ForeignKey('users.id', onupdate='CASCADE', ondelete='CASCADE'))
     provider = Column(ENUM('local', 'google', name='providers'))

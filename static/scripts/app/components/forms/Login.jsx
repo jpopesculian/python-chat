@@ -53,23 +53,29 @@ class LoginForm extends React.Component {
           if (Http.isOk(response)) {
             return this.props.onSuccess(response)
           }
-          let code = response.body.error
-          let errorMessage = ''
-          switch (code) {
-          case 'password_wrong':
-            errorMessage = 'Wrong Password'
-            this.setState({form: this.state.form.set('passwordError', errorMessage)})
-            break
-          default:
-            errorMessage = 'User not registered'
-            this.setState({form: this.state.form.set('identifierError', errorMessage)})
-          }
-          return false
+          let code = response.get('body').error
+          return this._handleFormError(code)
         })
   }
 
   componentWillUnmount() {
     this.streams.dispose()
+  }
+
+  _handleFormError(code) {
+    let field = ''
+    let message = ''
+    switch (code) {
+    case 'password_wrong':
+      field = 'password'
+      message = 'Wrong Password'
+      break
+    default:
+      field = 'identifier'
+      message = 'User not registered'
+    }
+    this.setState({form: this.state.form.set(`${field}Error`, message)})
+    return false
   }
 
   render() {

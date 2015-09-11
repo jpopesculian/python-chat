@@ -51,6 +51,10 @@ class Container extends React.Component {
     return {order: assignment}
   }
 
+  _getHeightStyle(assignment) {
+    return assignment === 'full' ? {height: '100%'} : {}
+  }
+
   static _alignValues = {
     start: 'flex-start',
     center: 'center',
@@ -60,10 +64,14 @@ class Container extends React.Component {
   }
 
   _getAlignStyle(assignment) {
+    let style = {}
     if (assignment === 'none') {
-      return {}
+      return style
+    } else if (assignment === 'stretch') {
+      style.height = '100%'
     }
-    return {alignSelf: Container._alignValues[assignment]}
+    style.alignSelf = Container._alignValues[assignment]
+    return style
   }
 
   _getPushStyle(assignment) {
@@ -130,6 +138,7 @@ class Container extends React.Component {
     let compiledStyles = [
       Container._baseStyle,
       this._extractStyle('align', ::this._getAlignStyle),
+      this._extractStyle('height', ::this._getHeightStyle),
       this._extractStyle('order', ::this._getOrderStyle),
       this._extractStyle('push', ::this._getPushStyle),
       this._extractStyle('span', ::this._getSpanStyle)

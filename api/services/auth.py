@@ -58,6 +58,12 @@ def authorized(reject=True):
     def _authorized(fn):
         @functools.wraps(fn)
         def inner(*args, **kwargs):
+
+            def reject():
+                if is_socket():
+                    return ('unauthorized', {'error': 'Not Authorized!'}, UNAUTHORIZED)
+                return ({'error': 'Not Authorized!'}, UNAUTHORIZED)
+
             config = args[0].app.config
             # get user from payload
             socket_data = None
@@ -67,13 +73,13 @@ def authorized(reject=True):
             payload = get_jwt_payload(config, socket_data)
             if 'user' not in payload:
                 if reject:
-                    if is_socket():
-                        return ('unauthorized', {'error': 'Not Authorized!'}, UNAUTHORIZED)
-                    return ({'error': 'Not Authorized!'}, UNAUTHORIZED)
+                    return reject()
                 else:
                     user = None
             else:
                 user = deserialize_user(payload['user'])
+                if not user and reject:
+                    return reject()
 
             # Inject into function
             if 'current_user' in inspect.getargspec(fn).args:

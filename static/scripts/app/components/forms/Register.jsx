@@ -68,22 +68,8 @@ class Register extends React.Component {
           if (Http.isOk(response)) {
             return this.props.onSuccess(response)
           }
-          let code = response.body.error
-          let errorMessage = ''
-          switch (code) {
-          case 'user_exists':
-            errorMessage = 'Username or Email already exists'
-            this.setState({form: this.state.form.set('usernameError', errorMessage)})
-            break
-          case 'invalid_password':
-            errorMessage = 'Password Invalid'
-            this.setState({form: this.state.form.set('passwordError', errorMessage)})
-            break
-          default:
-            errorMessage = 'User could not be created'
-            this.setState({form: this.state.form.set('usernameError', errorMessage)})
-          }
-          return false
+          let code = response.get('body').error
+          return this._handleFormError(code)
         }
       )
   }
@@ -92,15 +78,35 @@ class Register extends React.Component {
     this.streams.dispose()
   }
 
+  _handleFormError(code) {
+    let field = ''
+    let message = ''
+    switch (code) {
+    case 'user_exists':
+      field = 'username'
+      message = 'Username or Email already exists'
+      break
+    case 'invalid_password':
+      field = 'password'
+      message = 'Password Invalid'
+      break
+    default:
+      field = 'username'
+      message = 'User could not be created'
+    }
+    this.setState({form: this.state.form.set(`${field}Error`, message)})
+    return false
+  }
+
   _validateForm() {
     let usernameError = this._validateUsername(this._formValues.get('username'))
     let emailError = this._validateEmail(this._formValues.get('email'))
     let passwordError = this._validatePassword(this._formValues.get('password'))
-    let formErrors = this.state.form
-      .set('usernameError', usernameError)
-      .set('emailError', emailError)
-      .set('passwordError', passwordError)
-    this.setState({form: formErrors })
+    // let formErrors = this.state.form
+    //   .set('usernameError', usernameError)
+    //   .set('emailError', emailError)
+    //   .set('passwordError', passwordError)
+    // this.setState({form: formErrors })
     return !usernameError && !emailError && !passwordError
   }
 

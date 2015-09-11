@@ -1,11 +1,11 @@
-from api.core import Model, Base
+from api.core.database import Model, Base, WithId, WithTimeStamp
 from api.utils.database import NormalizedString
 from api.utils.strings import normalize_str
 from api.utils.validators import is_email, is_username
 from sqlalchemy import Column
 from sqlalchemy.orm import relationship, validates
 
-class User(Model, Base):
+class User(Base, Model, WithId, WithTimeStamp):
 
     name = Column(NormalizedString, index=True, unique=True)
     email = Column(NormalizedString, index=True, unique=True)

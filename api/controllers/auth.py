@@ -16,7 +16,6 @@ class AuthController(Controller):
     @route('/who')
     @authorized()
     def who(self, current_user):
-        print(current_user)
         return current_user.dict()
 
     @route('/<provider>', methods=['GET', 'POST'])

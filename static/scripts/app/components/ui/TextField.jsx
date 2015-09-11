@@ -33,9 +33,9 @@ class TextField extends React.Component {
     ].concat(this.props.styles.get('hint'))
     return (
       <div>
-        <label style={labelStyles}>{this.props.label}</label>
-        <input {...this.props} style={inputStyles} />
-        <span style={hintStyles}>{this.props.error}</span>
+        <label ref="label" style={labelStyles}>{this.props.label}</label>
+        <input {...this.props} ref="input" style={inputStyles}/>
+        <span ref="hint" style={hintStyles} >{this.props.error}</span>
       </div>
     )
   }

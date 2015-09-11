@@ -31,10 +31,10 @@ class App extends React.Component {
   render() {
     return (
       <Layout align={'stretch'} height={'view'}>
-        <Container span={'16em'}>
+        <Container height={'full'} span={'16em'}>
           {this.props.children.sidebar}
         </Container>
-        <Container>
+        <Container height={'full'}>
           {this.props.children.main}
         </Container>
       </Layout>

@@ -14,20 +14,25 @@ class Model:
     def __tablename__(cls):
         return to_camel_case(cls.__name__)+'s'
 
-    @declared_attr
-    def id(cls):
-        sequence_name = "%s_id_seq" % cls.__tablename__
-        return Column(Integer, Sequence(sequence_name), primary_key=True)
-
-    created_at = Column(DateTime, default=now)
-    updated_at = Column(DateTime, onupdate=now, default=now)
-
     def dict(self):
         d = {}
         for column in self.__table__.columns:
             if not column.name.startswith('_'):
                 d[column.name] = getattr(self, column.name)
         return d
+
+class WithId:
+
+    @declared_attr
+    def id(cls):
+        sequence_name = "%s_id_seq" % cls.__tablename__
+        return Column(Integer, Sequence(sequence_name), primary_key=True)
+
+class WithTimeStamp:
+
+    created_at = Column(DateTime, default=now)
+    updated_at = Column(DateTime, onupdate=now, default=now)
+
 
 Base = declarative_base()
 

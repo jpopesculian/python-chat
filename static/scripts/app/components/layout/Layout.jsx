@@ -126,7 +126,7 @@ class Layout extends React.Component {
     Layout._cssProps.map((cssProp, propName) => {
       compiledStyles.push(this._extractStyle(propName, this._getStyle.bind(this, propName)))
     })
-    compiledStyles.concat(this.props.style)
+    compiledStyles = compiledStyles.concat(this.props.style)
     return <div {...this.props} style={compiledStyles}>{this.props.children}</div>
   }
 

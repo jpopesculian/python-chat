@@ -6,7 +6,7 @@ import reactMixin from 'react-mixin'
 import { Navigation } from 'react-router'
 import { Layout, Container } from 'app/components/layout/system'
 import StreamMap from 'app/services/stream-map'
-import NewChannelForm from 'app/components/forms/NewChannel'
+import NewRoomForm from 'app/components/forms/NewRoom'
 
 @Radium
 @reactMixin.decorate(Navigation)
@@ -21,8 +21,8 @@ class Sidebar extends React.Component {
   }
 
   componentWillMount() {
-    this.streams = new StreamMap('newChannelSubmit')
-    this.streams.get('newChannelSubmit')
+    this.streams = new StreamMap('newRoomSubmit')
+    this.streams.get('newRoomSubmit')
       .subscribe((data) => {
         console.log(data)
       })
@@ -36,7 +36,7 @@ class Sidebar extends React.Component {
     return (
       <Layout align={"stretch"} height={"full"} kind={"column"} style={{background: '#DDD'}}>
         <Container push={'.5em'} span={"none"}>
-          <NewChannelForm onSuccess={this.streams.get('newChannelSubmit')}/>
+          <NewRoomForm onSuccess={this.streams.get('newRoomSubmit')}/>
         </Container>
         <Container push={'.5em'} />
       </Layout>
