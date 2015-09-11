@@ -59,25 +59,37 @@ export function isNum(n) {
 }
 
 export function isInt(n) {
-  return this.isNum(n) && n % 1 === 0
+  return isNum(n) && n % 1 === 0
 }
 
 export function isFloat(n) {
-  return this.isNum(n) && n % 1 !== 0
+  return isNum(n) && n % 1 !== 0
 }
 
 export function isEmail(email) {
-  if (!this.isStr(email)) {
-    return false
-  }
-  let emailRe = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
-  return emailRe.test(email)
+  const RE = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
+  return RE.test(email)
+}
+
+export function isUrl(url) {
+  const RE = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/
+  return RE.test(url)
+}
+
+export function isSlug(slug) {
+  const RE = /^[a-zA-Z0-9][a-zA-Z0-9_\-+\.]*[a-zA-Z0-9]$/
+  return RE.test(slug)
 }
 
 export function pop(obj, key) {
   let value = obj[key]
   delete obj[key]
   return value
+}
+
+export function preventDefault(event) {
+  event.preventDefault()
+  return false
 }
 
 export function extractTargetValue(event) {
@@ -91,4 +103,32 @@ export function* forEach(obj) {
       yield {key, value}
     }
   }
+}
+
+export function arrHas(arr, item) {
+  return arr.indexOf(item) > -1
+}
+
+export function arrHasOneOf(arr, items) {
+  for (let item of items) {
+    if (arrHas(arr, item)) {
+      return true
+    }
+  }
+  return false
+}
+
+export function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+export function toCamelCase(string) {
+  let pieces = string.split(/(-|_)/)
+  if (pieces.length > 1) {
+    for (let i = 1; i < pieces.length; i++) {
+      pieces[i] = capitalizeFirstLetter(pieces[i])
+    }
+    return pieces.join()
+  }
+  return string
 }

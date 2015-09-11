@@ -9,6 +9,7 @@ body {
 
 html,
 body,
+button,
 div,
 span,
 applet,
@@ -20,6 +21,7 @@ h3,
 h4,
 h5,
 h6,
+input,
 p,
 blockquote,
 pre,
@@ -94,6 +96,7 @@ video {
   font-size: 100%;
   font: inherit;
   vertical-align: baseline;
+  background: rgba(255,255,255,0)
 }
 
 article,
@@ -143,4 +146,20 @@ q {
 table {
   border-collapse: collapse;
   border-spacing: 0;
+}
+
+a,
+button {
+  text-decoration: none;
+  &:hover {
+    cursor: pointer;
+  }
+  &:visited,
+  &:active {
+    color: inherit;
+  }
+}
+
+*:focus {
+    outline: 0;
 }

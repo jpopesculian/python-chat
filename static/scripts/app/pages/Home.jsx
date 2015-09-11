@@ -1,7 +1,7 @@
 import React from 'react'
 import reactMixin from 'react-mixin'
 import { Navigation } from 'react-router'
-import {Layout, Container} from 'app/components/layout/system'
+import Anchor from 'app/components/ui/Anchor'
 
 @reactMixin.decorate(Navigation)
 class Home extends React.Component {
@@ -11,9 +11,7 @@ class Home extends React.Component {
   }
 
   render() {
-    return (
-      <Layout height={{xs: 'full', md: 'auto'}} kind='column'/>
-    )
+    return (<div><Anchor href="http://google.com">Google</Anchor></div>)
   }
 
 }

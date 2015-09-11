@@ -1,24 +1,51 @@
 import React from 'react'
-import {Link} from 'react-router'
+import Radium from 'radium'
+import reactMixin from 'react-mixin'
 
-class Anchor extends React.Component {
+import {Navigation} from 'react-router'
+import Immutable from 'immutable'
+import {PRIMARY_COLOR} from 'app/config/styles/colors'
+import {isUrl} from 'app/services/utils'
+
+@Radium
+@reactMixin.decorate(Navigation)
+class Link extends React.Component {
 
   static propTypes = {
     children: React.PropTypes.node,
-    href: React.PropTypes.string
+    to: React.PropTypes.string
   }
 
   constructor(props) {
     super(props)
   }
 
+
   render() {
-    let {href} = this.props
-    if (href.startsWith('/')) {
-      return <Link to={href} {...this.props}>{this.props.children}</Link>
+    let {to} = this.props
+    let props = Object.assign({}, this.props)
+    if (to) {
+      if (isUrl(to)) {
+        props.href = to
+      } else {
+        props.onClick = () => this.transitionTo(to)
+      }
     }
-    return <a href={href} {...this.props}>{this.props.children}</a>
+    let style = [styles.get('base')]
+    return (
+      <a {...props} style={style}>{this.props.children}</a>
+    )
   }
 }
 
-export default Anchor
+var styles = Immutable.Map({
+  base: {
+    color: PRIMARY_COLOR.hslString(),
+    transition: 'color .2s',
+    ':hover': {
+      color: PRIMARY_COLOR.lighten(0.4).hslString()
+    }
+  }
+})
+
+export default Link

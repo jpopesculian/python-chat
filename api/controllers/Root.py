@@ -6,8 +6,8 @@ class RootController(Controller):
 
     @route(['/', '/<path:path>'])
     def index(self, path=''):
-        print(path)
-        return self.send_static_file('index.html')
+        path = path if path in ['favicon.ico', 'robots.txt'] else 'index.html'
+        return self.send_static_file(path)
 
     @route('/ping')
     def ping(self):

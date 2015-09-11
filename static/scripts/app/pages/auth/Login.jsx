@@ -7,9 +7,11 @@ import StreamMap from 'app/services/stream-map'
 import Http from 'app/services/http'
 import {extractTargetValue} from 'app/services/utils'
 
+import {Layout, Container} from 'app/components/layout/system'
 import TextField from 'app/components/ui/TextField'
 import Button from 'app/components/ui/Button'
 import Form from 'app/components/ui/Form'
+import Anchor from 'app/components/ui/Anchor'
 
 @reactMixin.decorate(Navigation)
 class Login extends React.Component {
@@ -47,8 +49,8 @@ class Login extends React.Component {
         return Http.post('/api/v1/auth/local', data)
       })
       .subscribe(
-        (response) => {
-          console.log(response)
+        () => {
+          this.transitionTo('/messages')
         },
         (error) => {
           let code = error.body.error
@@ -72,23 +74,34 @@ class Login extends React.Component {
   render() {
     let {form} = this.state
     return (
-      <Form onSubmit={this.streams.get('formSubmit')}>
-        <TextField
-          error={form.get('identifierError')}
-          label="identifier"
-          onChange={this.streams.get('identifierField')}
-          ref="identifierField"
-          type="text"
-        />
-        <TextField
-          error={form.get('passwordError')}
-          label="password"
-          onChange={this.streams.get('passwordField')}
-          ref="passwordField"
-          type={form.get('passwordHidden') ? 'password' : 'text'}
-        />
-        <Button type="submit">Submit</Button>
-      </Form>
+      <Layout height="full" align="center" justify="center">
+        <Container span={{xs: 0.9, sm: 2 / 3, md: 1 / 3}}>
+          <Form onSubmit={this.streams.get('formSubmit')}>
+            <TextField
+              error={form.get('identifierError')}
+              onChange={this.streams.get('identifierField')}
+              placeholder="username or email"
+              ref="identifierField"
+              type="text"
+            />
+            <TextField
+              error={form.get('passwordError')}
+              onChange={this.streams.get('passwordField')}
+              placeholder="password"
+              ref="passwordField"
+              type={form.get('passwordHidden') ? 'password' : 'text'}
+            />
+            <Layout align={'center'}>
+              <Container order={2} span={'none'}>
+                <Button type="submit">Submit</Button>
+              </Container>
+              <Container order={1} push={{right: 'auto'}}>
+                <Anchor to="/register">Register</Anchor>
+              </Container>
+            </Layout>
+          </Form>
+        </Container>
+      </Layout>
     )
   }
 

@@ -5,11 +5,13 @@ import reactMixin from 'react-mixin'
 
 import StreamMap from 'app/services/stream-map'
 import Http from 'app/services/http'
-import {extractTargetValue, isEmail} from 'app/services/utils'
+import {extractTargetValue, isEmail, isSlug, preventDefault} from 'app/services/utils'
 
+import {Layout, Container} from 'app/components/layout/system'
 import TextField from 'app/components/ui/TextField'
 import Button from 'app/components/ui/Button'
 import Form from 'app/components/ui/Form'
+import Anchor from 'app/components/ui/Anchor'
 
 @reactMixin.decorate(Navigation)
 class Register extends React.Component {
@@ -52,18 +54,15 @@ class Register extends React.Component {
       .subscribe((error) => this.setState({form: this.state.form.set('passwordError', error)}))
 
     this.streams.get('formSubmit')
-      .map((event) => {
-        event.preventDefault()
-        return false
-      })
+      .map(preventDefault)
       .filter(::this._validateForm)
       .flatMap(() => {
         let data = this._formValues.toObject()
         return Http.post('/api/v1/auth/local/register', data)
       })
       .subscribe(
-        (response) => {
-          console.log(response)
+        () => {
+          this.transitionTo('/messages')
         },
         (error) => {
           let code = error.body.error
@@ -102,15 +101,14 @@ class Register extends React.Component {
 
   _validateUsername(username) {
     let error = ''
-    let usernameRe = /^[a-zA-Z0-9][a-zA-Z0-9_\-+\.]*[a-zA-Z0-9]$/
     if (!username) {
       error = 'Required'
     } else if (username.length < 3) {
       error = 'Must be at least 3 characters long'
     } else if (username.length > 64) {
       error = 'Must be less than 64 characters long'
-    } else if (!usernameRe.test(username)) {
-      error = 'May only contain numbers, letters and + . - or _'
+    } else if (!isSlug(username)) {
+      error = 'Invalid username (no spaces or weird characters)'
     }
     return error
   }
@@ -140,30 +138,41 @@ class Register extends React.Component {
   render() {
     let {form} = this.state
     return (
-      <Form onSubmit={this.streams.get('formSubmit')}>
-        <TextField
-          error={form.get('usernameError')}
-          label="username"
-          onChange={this.streams.get('usernameField')}
-          ref="usernameField"
-          type="text"
-        />
-        <TextField
-          error={form.get('emailError')}
-          label="email"
-          onChange={this.streams.get('emailField')}
-          ref="emailField"
-          type="email"
-        />
-        <TextField
-          error={form.get('passwordError')}
-          label="password"
-          onChange={this.streams.get('passwordField')}
-          ref="passwordField"
-          type={form.get('passwordHidden') ? 'password' : 'text'}
-        />
-        <Button type="submit">Submit</Button>
-      </Form>
+      <Layout height="full" align="center" justify="center">
+        <Container span={{xs: 0.9, sm: 2 / 3, md: 1 / 3}}>
+          <Form onSubmit={this.streams.get('formSubmit')}>
+            <TextField
+              error={form.get('usernameError')}
+              onChange={this.streams.get('usernameField')}
+              placeholder="username"
+              ref="usernameField"
+              type="text"
+            />
+            <TextField
+              error={form.get('emailError')}
+              onChange={this.streams.get('emailField')}
+              placeholder="email"
+              ref="emailField"
+              type="email"
+            />
+            <TextField
+              error={form.get('passwordError')}
+              onChange={this.streams.get('passwordField')}
+              placeholder="password"
+              ref="passwordField"
+              type={form.get('passwordHidden') ? 'password' : 'text'}
+            />
+            <Layout align={'center'}>
+              <Container order={2} span={'none'}>
+                <Button type="submit">Submit</Button>
+              </Container>
+              <Container order={1} push={{right: 'auto'}}>
+                <Anchor to="/login">Login</Anchor>
+              </Container>
+            </Layout>
+          </Form>
+        </Container>
+      </Layout>
     )
   }
 
