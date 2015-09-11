@@ -28,9 +28,11 @@ def get_jwt_payload(config, socket_data=None):
     secret = config['SECRET_KEY']
     algorithm = config.get('CRYPT_ALGO', 'HS256')
     try:
-        payload = jwt.decode(authorization, secret, algorithm=algorithm)
+        options = {'verify_exp': False, 'verify_iat': False}
+        payload = jwt.decode(authorization, secret, algorithm=algorithm, options=options)
     except jwt.InvalidTokenError:
         payload = {}
+    print(payload)
     return payload
 
 def create_token(payload, config):
@@ -103,8 +105,9 @@ def authorize(controller, user, message='authorized', socket_data=None):
     payload = get_jwt_payload(config, socket_data)
     # make new token
     payload['user'] = serialize_user(user)
-    payload = update_exp(payload, config)
+    # payload = update_exp(payload, config)
     token = create_token(payload, config)
+    print(payload)
     # get headers
     header, token_string = header_string(token, config)
     headers = {header: token_string}

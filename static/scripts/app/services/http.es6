@@ -1,6 +1,7 @@
 import xhr from 'xhr'
 import JWT from './jwt'
 import Rx from 'rx'
+import Immutable from 'immutable'
 import {forEach} from './utils'
 import { HOST } from 'app/config/general'
 import { AUTH_HEADER_NAME } from 'app/config/auth'
@@ -41,14 +42,11 @@ class Http {
       }
       options = Object.assign(options, args)
       xhr(options, (err, res, body) => {
-        let response = {err, res, body}
-        if (res.statusCode === 200) {
+        let response = Immutable.Map({err, res, body})
+        if (res.statusCode === 200 && res.headers[AUTH_HEADER_NAME]) {
           JWT.key = res.headers[AUTH_HEADER_NAME]
-          observer.onNext(response)
-        } else {
-          observer.onError(response)
         }
-        observer.onCompleted(response)
+        observer.onNext(response)
       })
     })
     return observable
@@ -69,6 +67,10 @@ class Http {
       url += seperator + key + '=' + uriValue
     }
     return url
+  }
+
+  static isOk(response) {
+    return response.get('res').statusCode === 200
   }
 }
 

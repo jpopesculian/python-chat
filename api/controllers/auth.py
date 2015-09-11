@@ -10,11 +10,13 @@ class AuthController(Controller):
 
     @route('/logout')
     def logout(self):
-        return {'message': 'logged out'}, 200, {}
+        auth_header = self.config.get('AUTH_HEADER', 'Authorization')
+        return {'message': 'logged out'}, 200, {auth_header: 'invalidated'}
 
     @route('/who')
     @authorized()
     def who(self, current_user):
+        print(current_user)
         return current_user.dict()
 
     @route('/<provider>', methods=['GET', 'POST'])

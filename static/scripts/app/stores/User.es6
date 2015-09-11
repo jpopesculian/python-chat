@@ -1,4 +1,4 @@
-import Store, {types} from 'app/services/Store'
+import Store, {types} from 'app/services/store'
 import Immutable from 'immutable'
 
 let userStore = {

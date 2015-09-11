@@ -1,2 +1,3 @@
-from .Root import RootController
-from .Auth import AuthController
+from .root import RootController
+from .auth import AuthController
+from .channel import ChannelController

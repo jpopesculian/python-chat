@@ -1,6 +1,7 @@
 import io from 'socket.io-client'
 import JWT from './jwt'
 import Rx from 'rx'
+import Immutable from 'immutable'
 import { HOST } from 'app/config/general'
 import { AUTH_HEADER_NAME } from 'app/config/auth'
 
@@ -20,7 +21,7 @@ class Socket {
     if (authorization) {
       headers[AUTH_HEADER_NAME] = authorization
     }
-    let message = {data, status, headers}
+    let message = Immutable.Map({data, status, headers})
     this.io.emit(event, message)
   }
 
