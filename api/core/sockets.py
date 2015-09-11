@@ -1,6 +1,7 @@
 import functools
 from flask.ext.socketio import SocketIO
 from api.utils.codes import OK
+from api.utils.json import dumps
 
 class Socket(SocketIO):
 
@@ -13,7 +14,7 @@ class Socket(SocketIO):
             'data': data,
             'status': status
         }
-        return super().emit(event, message, **kwargs)
+        return super().emit(event, dumps(message), **kwargs)
 
     def send(self, *args, **kwargs):
         kwargs['broadcast'] = False

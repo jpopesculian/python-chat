@@ -4,7 +4,7 @@ import Immutable from 'immutable'
 import { Navigation } from 'react-router'
 import {Container, Layout} from 'app/components/layout/system'
 import Http from 'app/services/http'
-import UserStore from 'app/stores/User'
+import UserStore from 'app/stores/user'
 
 @reactMixin.decorate(Navigation)
 class App extends React.Component {

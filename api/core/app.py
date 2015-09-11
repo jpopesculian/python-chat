@@ -4,6 +4,7 @@ from flask import Flask
 import api.config
 from api.utils.modules import find_decorators
 from api.utils.misc import splash
+from api.utils.json import Encoder
 from .controllers import Controller
 from .sockets import Socket
 from .database import init_db
@@ -14,7 +15,7 @@ class App(Flask):
     def __init__(self, *args, **kwargs):
         controllers = kwargs.pop('controllers', None)
         env = kwargs.pop('env', None)
-        if type(env) is not str:
+        if not isinstance(env, str):
             env = os.getenv('FLASK_ENV', 'dev')
         config = api.config.get_object(env)
 
@@ -29,6 +30,7 @@ class App(Flask):
         self.socket = self._create_socket()
         if controllers:
             self._register_all(controllers)
+        self.json_encoder = Encoder
 
     def start(self, host=None, port=None, **kwargs):
         if not host: host = self.config.get('HOST', 'localhost')

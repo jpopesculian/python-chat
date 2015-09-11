@@ -7,6 +7,7 @@ import { Navigation } from 'react-router'
 import { Layout, Container } from 'app/components/layout/system'
 import StreamMap from 'app/services/stream-map'
 import NewRoomForm from 'app/components/forms/NewRoom'
+import RoomList from 'app/components/modules/RoomList'
 
 @Radium
 @reactMixin.decorate(Navigation)
@@ -38,7 +39,9 @@ class Sidebar extends React.Component {
         <Container push={'.5em'} span={"none"}>
           <NewRoomForm onSuccess={this.streams.get('newRoomSubmit')}/>
         </Container>
-        <Container push={'.5em'} />
+        <Container push={'.5em'}>
+          <RoomList/>
+        </Container>
       </Layout>
     )
   }

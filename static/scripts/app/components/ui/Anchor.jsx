@@ -5,7 +5,7 @@ import reactMixin from 'react-mixin'
 import {Navigation} from 'react-router'
 import Immutable from 'immutable'
 import {PRIMARY_COLOR} from 'app/config/styles/colors'
-import {isUrl} from 'app/services/utils'
+import {isUrl} from 'app/services/validators'
 
 @Radium
 @reactMixin.decorate(Navigation)

@@ -60,7 +60,7 @@ var styles = Immutable.Map({
     base: {
       display: 'block',
       lineHeight: DEFAULT_LINE_HEIGHT,
-      height: `${DEFAULT_LINE_HEIGHT}em`,
+      minHeight: `${DEFAULT_LINE_HEIGHT}em`,
       color: 'red'
     }
   })

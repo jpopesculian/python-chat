@@ -1,5 +1,6 @@
 import io from 'socket.io-client'
 import JWT from './jwt'
+import {parse} from './utils'
 import Rx from 'rx'
 import Immutable from 'immutable'
 import { HOST } from 'app/config/general'
@@ -26,16 +27,17 @@ class Socket {
   }
 
   on(event = 'message') {
-    let observable = Rx.Observable.create(function(observer) {
-      this.io.on(event, (res) => {
+    let observe = (observer) => {
+      this.io.on(event, (data) => {
+        let res = parse(data)
         let authorization = res.headers[AUTH_HEADER_NAME]
         if (authorization) {
           JWT.key = authorization
         }
         observer.onNext(res)
       })
-    })
-    return observable
+    }
+    return Rx.Observable.create(observe)
   }
 
 }

@@ -1,5 +1,5 @@
 import Rx from 'rx'
-import {isDefined, isNull, isFunc, isStr, isInt, isFloat, isNum} from './utils'
+import {isDefined, isNull, isFunc, isStr, isInt, isFloat, isNum} from './validators'
 import LocalStorage from './local-storage'
 import Immutable from 'immutable'
 
@@ -32,9 +32,9 @@ class Store {
       let actionStream = new Rx.Subject()
 
       let transform = isFunc(config.get('transform')) ?
-        config.get('transform') : (old, update) => update
+        config.get('transform') : (op, old, update) => update
       let updateStream = actionStream.withLatestFrom(valueStream, (action, oldValue) => {
-        let newValue = transform(oldValue, action.value, action.op)
+        let newValue = transform(action.op, oldValue, action.value)
         valueStream.onNext(newValue)
         return {value: newValue, action: action}
       })
@@ -62,10 +62,10 @@ class Store {
   }
 
   set(key, value) {
-    this.update(key, value, 'set')
+    this.update('set', key, value)
   }
 
-  update(key, value, op) {
+  update(op, key, value) {
     this._actionStreams.get(key).onNext({op, value})
   }
 

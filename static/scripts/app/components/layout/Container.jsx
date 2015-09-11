@@ -1,7 +1,7 @@
 import React from 'react'
 import Radium from 'radium'
-import { isObj, isFloat, isNum, isStr, isArr, forEach, arrHasOneOf, capitalizeFirstLetter }
-  from 'app/services/utils'
+import { forEach, arrHasOneOf, capitalizeFirstLetter } from 'app/services/utils'
+import { isObj, isFloat, isNum, isStr, isArr } from 'app/services/validators'
 import {getBreakpoint} from 'app/config/styles/media'
 import Immutable from 'immutable'
 

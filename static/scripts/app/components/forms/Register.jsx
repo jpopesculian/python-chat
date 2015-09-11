@@ -3,7 +3,8 @@ import Immutable from 'immutable'
 
 import StreamMap from 'app/services/stream-map'
 import Http from 'app/services/http'
-import {extractTargetValue, isEmail, isSlug, preventDefault} from 'app/services/utils'
+import {extractTargetValue, preventDefault} from 'app/services/utils'
+import {isEmail, isSlug} from 'app/services/validators'
 
 import TextField from 'app/components/ui/TextField'
 import Form from 'app/components/ui/Form'

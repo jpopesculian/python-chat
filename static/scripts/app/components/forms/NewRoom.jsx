@@ -6,7 +6,8 @@ import TextField from 'app/components/ui/TextField'
 import Form from 'app/components/ui/Form'
 import StreamMap from 'app/services/stream-map'
 import Http from 'app/services/http'
-import {extractTargetValue, isSlug, preventDefault} from 'app/services/utils'
+import {extractTargetValue, preventDefault} from 'app/services/utils'
+import {isSlug} from 'app/services/validators'
 
 class NewRoomForm extends React.Component {
 

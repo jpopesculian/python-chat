@@ -1,6 +1,7 @@
 import React from 'react'
 import Radium from 'radium'
-import {isObj, forEach} from 'app/services/utils'
+import {forEach} from 'app/services/utils'
+import {isObj} from 'app/services/validators'
 import {getBreakpoint} from 'app/config/styles/media'
 import Immutable from 'immutable'
 
