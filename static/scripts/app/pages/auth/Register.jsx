@@ -7,7 +7,7 @@ import RegisterForm from 'app/components/forms/Register'
 
 import {Layout, Container} from 'app/components/layout/system'
 import Button from 'app/components/ui/Button'
-import Anchor from 'app/components/ui/Anchor'
+import Link from 'app/components/ui/Link'
 
 @reactMixin.decorate(Navigation)
 class Register extends React.Component {
@@ -37,7 +37,7 @@ class Register extends React.Component {
                 <Button type="submit">Submit</Button>
               </Container>
               <Container order={1} push={{right: 'auto'}}>
-                <Anchor to="/login">Login</Anchor>
+                <Link to="/login">Login</Link>
               </Container>
             </Layout>
           </RegisterForm>

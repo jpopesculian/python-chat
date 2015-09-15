@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import Immutable from 'immutable'
 import Rx from 'rx'
 
@@ -59,7 +60,7 @@ class NewRoomForm extends React.Component {
         (response) => {
           this.streams.get('validatable').onNext(true)
           if (Http.isOk(response)) {
-            React.findDOMNode(this.refs.newRoomField.refs.input).value = ''
+            ReactDOM.findDOMNode(this.refs.newRoomField.refs.input).value = ''
             return this.props.onSuccess(response)
           }
           let code = response.get('body').error

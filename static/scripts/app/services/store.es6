@@ -62,10 +62,10 @@ class Store {
   }
 
   set(key, value) {
-    this.update('set', key, value)
+    this.update(key, 'set', value)
   }
 
-  update(op, key, value) {
+  update(key, op, value) {
     this._actionStreams.get(key).onNext({op, value})
   }
 

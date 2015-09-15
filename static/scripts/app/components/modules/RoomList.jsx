@@ -5,20 +5,21 @@ import StreamMap from 'app/services/stream-map'
 import Http from 'app/services/http'
 import Socket from 'app/services/socket'
 import RoomStore from 'app/stores/room'
+import RoomItem from './RoomItem'
 import {Layout, Container} from 'app/components/layout/system'
 
-class NewRoomForm extends React.Component {
+class RoomList extends React.Component {
 
   constructor(props) {
     super(props)
     this.state = {
-      messages: Immutable.List()
+      rooms: Immutable.List()
     }
   }
 
   componentWillMount() {
     this.streams = new StreamMap()
-    RoomStore.values('list').subscribe((messages) => this.setState({messages}))
+    RoomStore.values('list').subscribe((rooms) => this.setState({rooms}))
 
     Http.get('/api/v1/rooms')
       .subscribe((response) => {
@@ -27,8 +28,11 @@ class NewRoomForm extends React.Component {
           RoomStore.set('list', rooms)
         }
       })
-    Socket.on('new room')
-      .subscribe(::console.log)
+    let newRooms = Socket.on('new room')
+      .filter(Socket.isOk)
+      .map((response) => response.get('data'))
+      .subscribe((room) => RoomStore.update('list', 'add', room))
+    this.streams.set('newRooms', newRooms)
   }
 
   componentWillUnmount() {
@@ -37,10 +41,13 @@ class NewRoomForm extends React.Component {
 
 
   render() {
+    let rooms = this.state.rooms.map((room) => {
+      return (<RoomItem {...room}/>)
+    })
     return (
       <Layout>
         <Container>
-          <h1>Channels</h1>
+          {{rooms}}
         </Container>
       </Layout>
     )
@@ -48,4 +55,4 @@ class NewRoomForm extends React.Component {
 
 }
 
-export default NewRoomForm
+export default RoomList

@@ -48,6 +48,9 @@ class LazyLoader {
   }
 
   _import(path) {
+    if (!path) {
+      return () => new Promise((resolve) => resolve({'default': null}))
+    }
     return System.import.call(System, path)
   }
 
@@ -64,6 +67,9 @@ class LazyLoader {
   }
 
   _updatePath(path) {
+    if (!path) {
+      return path
+    }
     if (path.startsWith('/') || path.startsWith('.')) {
       return path
     }

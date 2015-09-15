@@ -16,8 +16,10 @@ let router = (
     <Route getComponents={ll.component('auth/Login')}
       path='/login'/>
     <Route getComponents={ll.component('App')}>
-      <Route getComponents={ll.components({main: 'app/Room', sidebar: 'app/Sidebar'})}
+      <Route getComponents={ll.components({main: false, sidebar: 'app/Sidebar'})}
         path='/messages'/>
+      <Route getComponents={ll.components({main: 'app/Room', sidebar: 'app/Sidebar'})}
+        path='/messages/:room'/>
     </Route>
   </Router>
 )

@@ -29,8 +29,8 @@ class Socket {
   on(event = 'message') {
     let observe = (observer) => {
       this.io.on(event, (data) => {
-        let res = parse(data)
-        let authorization = res.headers[AUTH_HEADER_NAME]
+        let res = Immutable.Map(parse(data))
+        let authorization = res.get('headers')[AUTH_HEADER_NAME]
         if (authorization) {
           JWT.key = authorization
         }
@@ -38,6 +38,10 @@ class Socket {
       })
     }
     return Rx.Observable.create(observe)
+  }
+
+  isOk(response) {
+    return response.get('status') === 200
   }
 
 }

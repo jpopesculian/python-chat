@@ -1,7 +1,7 @@
 import React from 'react'
 import Radium from 'radium'
 
-import Anchor from './Anchor'
+import Link from './Link'
 import {pop} from 'app/services/utils'
 import Immutable from 'immutable'
 import {DEFAULT_LINE_HEIGHT} from 'app/config/styles/typography'
@@ -20,7 +20,7 @@ class Button extends React.Component {
   }
 
   render() {
-    let Element = this.props.href ? Anchor : 'button'
+    let Element = this.props.href ? Link : 'button'
     let props = pop(Object.assign({}, this.props), 'style')
     let style = [styles.get('base')]
     return (
